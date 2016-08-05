@@ -31,6 +31,8 @@ import java.awt.event.ActionListener;
 
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
+import java.awt.event.KeyAdapter;
+import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.WindowAdapter;
@@ -78,6 +80,7 @@ public class reportsFrame {
 	JTextField year = new JTextField();
 	JComboBox type = new JComboBox();
 	public static JLabel lblNoOfResults = new JLabel();
+	private String numswap;
 
 	JLabel empty = new JLabel(" ");
 
@@ -115,17 +118,17 @@ public class reportsFrame {
 
 		reportFrame = new JFrame();
 		
-		reportFrame.addWindowListener(new WindowAdapter()
-        {
-            @Override
-            public void windowClosing(WindowEvent e)
-            {
-                //System.out.println("Closed");
-                MainScreen.frame.setVisible(true);
-                reportFrame.dispose();
-
-            }
-        });
+//		reportFrame.addWindowListener(new WindowAdapter()
+//        {
+//            @Override
+//            public void windowClosing(WindowEvent e)
+//            {
+//                //System.out.println("Closed");
+//                MainScreen.frame.setVisible(true);
+//                reportFrame.dispose();
+//
+//            }
+//        });
 		
 		reportFrame.setVisible(true);
 		reportFrame.setResizable(false);
@@ -168,7 +171,7 @@ public class reportsFrame {
 
 		JButton btnRunFileQuery = new JButton("Run");
 		btnRunFileQuery.setFont(font);
-
+		getYearInput();
 		btnRunFileQuery.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseClicked(MouseEvent e) {
@@ -350,6 +353,9 @@ public class reportsFrame {
 
 		//Reports JTable
 		reportsTable = new JTable();
+		{
+			
+		}
 		reportsTable.setFont(new Font("Segoe UI Semilight", Font.PLAIN, 22));
 		((DefaultCellEditor) reportsTable.getDefaultEditor(Object.class)).getComponent().setFont(reportsTable.getFont());
 		reportsTable.getTableHeader().setFont(new Font("Segoe UI Semilight", Font.PLAIN, 22));
@@ -741,4 +747,51 @@ public class reportsFrame {
 			JOptionPane.showMessageDialog(null, e);
 		}
 	}
+	public void getYearInput()
+	{
+		year.addKeyListener(new KeyAdapter() {
+            public void keyReleased(KeyEvent e) {
+                try {
+                    getIntegerInput(year, e);
+
+                } catch (NumberFormatException e1) {
+                    // TODO Auto-generated catch block
+                    e1.printStackTrace();
+                }
+            }
+        });
+	}
+	
+	public void getIntegerInput(JTextField jText, KeyEvent e){
+	    
+        numswap = null;
+        String temp = jText.getText();
+        //only accepts positives doubles
+        
+    
+        String regex = "(?<![-.])\\b[0-9]+\\b(?!\\.[0-9])";
+    
+        //    (?<![-.])   # Assert that the previous character isn't a minus sign or a dot.
+        //    \b          # Anchor the match to the start of a number.
+        //    [0-9]+      # Match a number.
+        //    \b          # Anchor the match to the end of the number.
+        //    (?!\.[0-9]) # Assert that no decimal part follows.
+    
+        if(temp.matches(regex))
+        {
+            numswap = temp;
+
+        }
+        else if((e.getKeyCode() == KeyEvent.VK_BACK_SPACE) || (e.getKeyCode() == KeyEvent.VK_DELETE) 
+                && temp.length() == 0)
+        {//deletes the element in textbox
+            jText.setText("");
+            numswap="";
+        }
+        
+        else{
+            jText.setText(numswap);
+        }
+    }
+
 } // end of ReportsFrame
