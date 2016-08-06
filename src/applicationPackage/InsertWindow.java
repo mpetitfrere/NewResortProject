@@ -67,7 +67,7 @@ public class InsertWindow {
     public JFrame frmInsertAsset = new JFrame();
     private SpringLayout springLayout = new SpringLayout();
     private JPanel g1_Jpanel;
-
+    private static Connection conn;
     //Global Variables
     private PreparedStatement prepare;
     private String     field3InputString;
@@ -131,7 +131,7 @@ public class InsertWindow {
      * @wbp.parser.entryPoint
      */
     private void initialize() throws SQLException {
-        Connection conn = MySQLConnection.dbConnector();
+    	conn= MySQLConnection.dbConnector();
         //Components
         JScrollPane scrollPane_1 = new JScrollPane();
         updateBtn = new JButton("Update");
@@ -254,13 +254,12 @@ public class InsertWindow {
 
             private void deleteItem() throws SQLException {
             
-                Connection conn = MySQLConnection.dbConnector();                
                 PreparedStatement prepareDel = conn.prepareStatement(deleteItemString);
                 prepareDel.executeUpdate();
                 UpDateTable();
                 JOptionPane.showMessageDialog(null, "Successfully deleted item: " + field1.getText());
                 prepareDel.close();
-                conn.close();
+                //conn.close();
             }
         });
         
@@ -268,7 +267,6 @@ public class InsertWindow {
     
     private void updateItems() throws SQLException {
         int ID = 0;
-        Connection conn = MySQLConnection.dbConnector();
         
         PreparedStatement prepareID = conn.prepareStatement(autoIDString);
         ResultSet resultsetID = prepareID.executeQuery();
@@ -295,7 +293,7 @@ public class InsertWindow {
         UpDateTable();
         clearFields();
         prepareUpdate.close();
-        conn.close();
+        //conn.close();
         JOptionPane.showMessageDialog(null, "Successfully updated item.", "Update" , JOptionPane.INFORMATION_MESSAGE);
 
         
@@ -512,7 +510,6 @@ public class InsertWindow {
     {
         try 
         {
-            Connection conn = MySQLConnection.dbConnector();
             DefaultTableModel dm = new DefaultTableModel(){
                 @Override
                 public Class getColumnClass(int c) {
@@ -533,7 +530,7 @@ public class InsertWindow {
 
             testTable.setModel(dm);
             refreshScreen();
-            conn.close();
+            //conn.close();
         
         } catch (Exception e) {
             JOptionPane.showMessageDialog(null, e);
@@ -570,7 +567,7 @@ public class InsertWindow {
     
     public void initPrepareStatment() throws SQLException
     {
-        Connection conn = MySQLConnection.dbConnector();
+         //= MySQLConnection.dbConnector();
         try {
             conn.setAutoCommit(false);
         } catch (SQLException e) {
@@ -836,7 +833,6 @@ public class InsertWindow {
     private void addTypes() throws SQLException {
 
         //Declare local variables
-        Connection conn2 = MySQLConnection.dbConnector();
         java.sql.Statement stmt;
         ArrayList<String> typeList = new ArrayList<String>();
         int count = 1;
@@ -844,7 +840,7 @@ public class InsertWindow {
         field3.removeAllItems();
 
         
-        stmt = conn2.createStatement(); // \"group\",price //\"group\",price
+        stmt = conn.createStatement(); // \"group\",price //\"group\",price
         ResultSet rs = stmt.executeQuery("SELECT Distinct Type From ResortManagement");
         String group = "";
         while (rs.next()) 
@@ -857,7 +853,7 @@ public class InsertWindow {
         //close connections
         rs.close();
         stmt.close();
-        conn2.close();
+        //conn.close();
         
         //sort the types add the editable field first then add the sorted types to combobox
         Collections.sort(typeList);
