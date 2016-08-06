@@ -4,6 +4,8 @@ import javax.swing.*;
 import javax.swing.GroupLayout.Alignment;
 import javax.swing.LayoutStyle.ComponentPlacement;
 import javax.swing.border.EmptyBorder;
+import javax.swing.plaf.ColorUIResource;
+import javax.swing.plaf.FontUIResource;
 
 import applicationPackage.MySQLConnection;
 
@@ -35,7 +37,7 @@ public class ExcelFrame extends JFrame {
      */
     public static void main(String[] args) {
         try {
-            UIManager.setLookAndFeel("javax.swing.plaf.nimbus.NimbusLookAndFeel");
+            //UIManager.setLookAndFeel("javax.swing.plaf.nimbus.NimbusLookAndFeel");
         } catch (Throwable e) {
             e.printStackTrace();
         }
@@ -57,6 +59,8 @@ public class ExcelFrame extends JFrame {
      */
     public ExcelFrame() {
     	
+
+
     	addWindowListener(new WindowAdapter()
         {
             @Override
@@ -79,7 +83,12 @@ public class ExcelFrame extends JFrame {
         contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
         contentPane.setBackground(new Color(244, 244, 244));
         setContentPane(contentPane);
-        ImageIcon icon = new ImageIcon(getClass().getResource("/Resources/appIconImage.png"));
+        setLocationRelativeTo(null);
+        //ImageIcon icon = new ImageIcon(getClass().getResource("/Resources/appIconImage.png"));
+
+		UIManager.put("ToolTip.foreground", new ColorUIResource(Color.WHITE));
+		UIManager.put("ToolTip.background", new ColorUIResource(new Color(0, 155, 167)));
+		UIManager.put("ToolTip.font", new FontUIResource("Segoe UI Semilight", Font.BOLD, 20));
 
 
         final JFileChooser fc = new JFileChooser();
@@ -170,6 +179,10 @@ public class ExcelFrame extends JFrame {
             public void mouseClicked(MouseEvent e) {
                 try {
                     ConvertExcel.exportExcel(false);
+
+
+
+
                 } catch (IOException e1) {e1.printStackTrace();
                 
 

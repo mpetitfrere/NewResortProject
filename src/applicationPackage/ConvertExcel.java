@@ -90,7 +90,7 @@ public class ConvertExcel {
      *
      *
      */
-    public static void exportExcel(JTable table)throws IOException
+	public static void exportExcel(JTable table)throws IOException
     {
 
         String excelName = excelName();
@@ -99,6 +99,9 @@ public class ConvertExcel {
         Workbook wb = new XSSFWorkbook(); //Excel workbook
         Sheet sheet = wb.createSheet(); //WorkSheet
         //Row row = sheet.createRow(1); //Row created at line 3
+        
+        
+
         TableModel model = table.getModel(); //Table model
 
         Row headerRow = sheet.createRow(0); //Create row at line 0
@@ -108,26 +111,29 @@ public class ConvertExcel {
             colName[headings] = table.getColumnName(headings);
         }
       
+       
+        
+        Row row = sheet.createRow(1); //Row created at line 3
+
+
         for(int rows = 0; rows < model.getRowCount(); rows++){ //For each table row
-            headerRow = sheet.createRow((rows+1));
+        	//Set the row to the next one in the sequence
+            row = sheet.createRow((rows + 1));
             for(int cols = 0; cols < table.getColumnCount(); cols++){ //For each table column
                 if(table.getColumnName(cols).equals(colName[cols]) )
                 {
-                    String columnString = colName[cols];
-                   // System.out.println("Col: " + columnString);
-                    //System.out.println(model.getRowCount());
+                	 String columnString = colName[cols];
                     if(!isColumnIntType(columnString))
                     {//writes cell as float type to remove error checking in excel
-                        XSSFCell cell = (XSSFCell) headerRow.createCell(cols);//create a cell at the row,col location
+                        XSSFCell cell = (XSSFCell) (row).createCell(cols);//create a cell at the row,col location
                         cell.setCellValue(Float.parseFloat((String) (model.getValueAt(rows, cols))));
-                        
-                       //row.createCell(cols).setCellValue(model.getValueAt(rows, cols).toString()); //Write value
+
                     }
                     else//writes the cell as strings
                     {
                         XSSFCell cell = (XSSFCell) headerRow.createCell(cols);//create a cell at the row,col location
                         String x = (String) (model.getValueAt(rows, cols));//get he  value from table
-                        //cell.setCellType(Cell.CELL_TYPE_STRING);
+
                         DataFormatter dfTemp = new DataFormatter();
                         cell.setCellValue(x);
                         cell.setCellValue( dfTemp.formatCellValue(cell));
@@ -137,6 +143,9 @@ public class ConvertExcel {
                 }
             }
             //Set the row to the next one in the sequence
+            
+
+
         }//end of row loop
         wb.write(new FileOutputStream(file.toString()));//Save the file
         openExcel(file);
@@ -492,22 +501,7 @@ public class ConvertExcel {
         int rowsCount = row.getRowNum();
 //        String [] colHeader =  new String[size];
         int columnLength = 0;
-//        for(int count = 0; count < size; count++)
-//        {//get column headers from excel
-//            
-//            XSSFCell cell = row.getCell(count);
-//            if (cell.getCellType() == XSSFCell.CELL_TYPE_STRING)
-//            {
-//                System.out.println(cell.getStringCellValue());
-//            }
-//            else if(cell.getCellType() == XSSFCell.CELL_TYPE_NUMERIC)
-//            {
-//                System.out.println(cell.getNumericCellValue()+" ");
-//            }
-////                System.out.println( cell.getStringCellValue());
-////                System.out.println( count);
-////                colHeader[count] = cell.getStringCellValue();        
-//        }
+
 
         //System.out.println("Total Number of Rows: " + (rowsCount + 1));
         int size = 7; //num of  columns
@@ -548,8 +542,11 @@ public class ConvertExcel {
         return true;
 
 
-    }//end of method
+    }
+}
+    //end of method
     
+
 //    public static void main(String args[]) throws IOException
 //    {
 //        //writeExcel();
@@ -572,4 +569,4 @@ public class ConvertExcel {
 //
 //    }
 
-}//End of ConvertExcel
+//}//End of ConvertExcel
