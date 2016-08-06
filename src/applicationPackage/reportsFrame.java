@@ -31,6 +31,8 @@ import java.awt.event.ActionListener;
 
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
+import java.awt.event.KeyAdapter;
+import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.WindowAdapter;
@@ -80,6 +82,8 @@ public class reportsFrame {
 	public static JLabel lblNoOfResults = new JLabel();
 
 	JLabel empty = new JLabel(" ");
+
+	String numSwap;
 
 	/**
 	 * Launch the application.
@@ -169,6 +173,8 @@ public class reportsFrame {
 		JButton btnRunFileQuery = new JButton("Run");
 		btnRunFileQuery.setFont(font);
 
+		getYearInput();
+		
 		btnRunFileQuery.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseClicked(MouseEvent e) {
@@ -285,7 +291,7 @@ public class reportsFrame {
 		
 		compPanel.setBorder(new EmptyBorder(25, 0, 0, 25));
 		compPanel.setBackground(new Color(244, 244, 244));
-		//compPanel.
+
 		JScrollPane scrollPane = new JScrollPane();
 		springLayout.putConstraint(SpringLayout.NORTH, scrollPane, 24, SpringLayout.NORTH,
 				reportFrame.getContentPane());
@@ -350,6 +356,15 @@ public class reportsFrame {
 
 		//Reports JTable
 		reportsTable = new JTable();
+
+		//Set JTable editable to false  
+				DefaultTableModel model = new DefaultTableModel();
+				reportsTable = new JTable(model) {
+					public boolean isCellEditable(int rowIndex, int colIndex) {
+						return false; // Disallow the editing of any cell
+					}
+				}; //end set JTable to false
+
 		reportsTable.setFont(new Font("Segoe UI Semilight", Font.PLAIN, 22));
 		((DefaultCellEditor) reportsTable.getDefaultEditor(Object.class)).getComponent().setFont(reportsTable.getFont());
 		reportsTable.getTableHeader().setFont(new Font("Segoe UI Semilight", Font.PLAIN, 22));
@@ -447,7 +462,7 @@ public class reportsFrame {
 			while (rs.next()) {
 				group = rs.getString("Type");
 				type.addItem(group);
-				// categoryDeactivated.addItem(group);
+			
 
 			}
 		} catch (SQLException e) {
@@ -508,7 +523,7 @@ public class reportsFrame {
 		reportsTable.getColumnModel().getColumn(4).setPreferredWidth(100);
 		reportsTable.getColumnModel().getColumn(5).setPreferredWidth(100);
 		reportsTable.getColumnModel().getColumn(6).setPreferredWidth(100);
-		// reportsTable.getColumnModel().getColumn(7).setPreferredWidth(100);
+		
 		countColumns();
 	}
 	
@@ -715,6 +730,53 @@ public class reportsFrame {
 			JOptionPane.showMessageDialog(null, e);
 		}
 	}
+	
+	public void getIntegerInput(JTextField jText, KeyEvent e){
+	    
+        numSwap = null;
+        String temp = jText.getText();
+        //only accepts positives doubles
+        
+    
+        String regex = "(?<![-.])\\b[0-9]+\\b(?!\\.[0-9])";
+    
+        //    (?<![-.])   # Assert that the previous character isn't a minus sign or a dot.
+        //    \b          # Anchor the match to the start of a number.
+        //    [0-9]+      # Match a number.
+        //    \b          # Anchor the match to the end of the number.
+        //    (?!\.[0-9]) # Assert that no decimal part follows.
+    
+        if(temp.matches(regex))
+        {
+            numSwap = temp;
+        }
+        else if((e.getKeyCode() == KeyEvent.VK_BACK_SPACE) || (e.getKeyCode() == KeyEvent.VK_DELETE) 
+                && temp.length() == 0)
+        {//deletes the element in textbox
+            jText.setText("");
+            numSwap="";
+        }
+        
+        else{
+            jText.setText(numSwap);
+        }
+    }
+	
+
+    public void getYearInput()
+    {
+        year.addKeyListener(new KeyAdapter() {
+            public void keyReleased(KeyEvent e) {
+                try {
+                    getIntegerInput(year, e);
+
+                } catch (NumberFormatException e1) {
+                    // TODO Auto-generated catch block
+                    e1.printStackTrace();
+                }
+            }
+        });
+    }
 
 	// NEEDED BIG TIME
 	public static void Association_By_Type_Name_And_Year(String name, String type, int year) {
