@@ -31,6 +31,8 @@ import java.awt.event.ActionListener;
 
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
+import java.awt.event.KeyAdapter;
+import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.WindowAdapter;
@@ -72,14 +74,18 @@ public class reportsFrame {
 
 	private JFrame reportFrame;
 	private static JTable reportsTable;
-
+	private static Connection conn2;
+;
 	// instantiating textfields for each jlabel
 	JTextField resortName = new JTextField();
 	JTextField year = new JTextField();
 	JComboBox type = new JComboBox();
 	public static JLabel lblNoOfResults = new JLabel();
+	private String numswap;
 
 	JLabel empty = new JLabel(" ");
+
+	String numSwap;
 
 	/**
 	 * Launch the application.
@@ -102,7 +108,6 @@ public class reportsFrame {
 	public reportsFrame() throws SQLException, ClassNotFoundException, InstantiationException, IllegalAccessException,
 			UnsupportedLookAndFeelException {
 		UIManager.setLookAndFeel("javax.swing.plaf.nimbus.NimbusLookAndFeel");
-		Connection conn = MySQLConnection.dbConnector();
 		initialize();
 		UpDateTable();
 
@@ -114,7 +119,8 @@ public class reportsFrame {
 	private void initialize() {
 
 		reportFrame = new JFrame();
-		
+		conn2 = MySQLConnection.dbConnector();
+
 		reportFrame.addWindowListener(new WindowAdapter()
         {
             @Override
@@ -168,6 +174,7 @@ public class reportsFrame {
 
 		JButton btnRunFileQuery = new JButton("Run");
 		btnRunFileQuery.setFont(font);
+		getYearInput();
 
 		btnRunFileQuery.addMouseListener(new MouseAdapter() {
 			@Override
@@ -285,7 +292,7 @@ public class reportsFrame {
 		
 		compPanel.setBorder(new EmptyBorder(25, 0, 0, 25));
 		compPanel.setBackground(new Color(244, 244, 244));
-		//compPanel.
+
 		JScrollPane scrollPane = new JScrollPane();
 		springLayout.putConstraint(SpringLayout.NORTH, scrollPane, 24, SpringLayout.NORTH,
 				reportFrame.getContentPane());
@@ -350,6 +357,18 @@ public class reportsFrame {
 
 		//Reports JTable
 		reportsTable = new JTable();
+		{
+			
+		}
+
+		//Set JTable editable to false  
+				DefaultTableModel model = new DefaultTableModel();
+				reportsTable = new JTable(model) {
+					public boolean isCellEditable(int rowIndex, int colIndex) {
+						return false; // Disallow the editing of any cell
+					}
+				}; //end set JTable to false
+
 		reportsTable.setFont(new Font("Segoe UI Semilight", Font.PLAIN, 22));
 		((DefaultCellEditor) reportsTable.getDefaultEditor(Object.class)).getComponent().setFont(reportsTable.getFont());
 		reportsTable.getTableHeader().setFont(new Font("Segoe UI Semilight", Font.PLAIN, 22));
@@ -434,7 +453,6 @@ public class reportsFrame {
 	// Adds categories to category drop down boxes
 	public void addCategoriesToJCombo() {
 
-		Connection conn2 = MySQLConnection.dbConnector();
 		java.sql.Statement stmt;
 
 		try {
@@ -447,7 +465,7 @@ public class reportsFrame {
 			while (rs.next()) {
 				group = rs.getString("Type");
 				type.addItem(group);
-				// categoryDeactivated.addItem(group);
+			
 
 			}
 		} catch (SQLException e) {
@@ -479,16 +497,15 @@ public class reportsFrame {
 	// update table from most recent data in database
 	public static void UpDateTable() {
 		try {
-			Connection conn = MySQLConnection.dbConnector();
 			DefaultTableModel dm = new DefaultTableModel();
 			String testTable_String = "Select * from ResortManagement";
-			PreparedStatement showTestTable = conn.prepareStatement(testTable_String);
+			PreparedStatement showTestTable = conn2.prepareStatement(testTable_String);
 			ResultSet rsTest = showTestTable.executeQuery();
 			addRowsAndColumns(rsTest, dm);
 			reportsTable.setModel(dm);
 			refreshScreen();
-
-			conn.close();
+			rsTest.close();
+			showTestTable.close();
 		} catch (Exception e) {
 			JOptionPane.showMessageDialog(null, e);
 		}
@@ -508,7 +525,7 @@ public class reportsFrame {
 		reportsTable.getColumnModel().getColumn(4).setPreferredWidth(100);
 		reportsTable.getColumnModel().getColumn(5).setPreferredWidth(100);
 		reportsTable.getColumnModel().getColumn(6).setPreferredWidth(100);
-		// reportsTable.getColumnModel().getColumn(7).setPreferredWidth(100);
+		
 		countColumns();
 	}
 	
@@ -519,7 +536,6 @@ public class reportsFrame {
 
 	public static void All_Associations_By_Name(String category, int year) {
 
-		Connection conn2 = MySQLConnection.dbConnector();
 		java.sql.Statement stmt;
 
 		try {
@@ -539,8 +555,8 @@ public class reportsFrame {
 			addRowsAndColumns(rsTest, dm);
 			reportsTable.setModel(dm);
 			refreshScreen();
-			conn2.close();
-
+			rsTest.close();
+			stmt.close();
 		} catch (Exception e) {
 			JOptionPane.showMessageDialog(null, e);
 		}
@@ -550,7 +566,6 @@ public class reportsFrame {
 																				// BIG
 																				// TIME
 
-		Connection conn2 = MySQLConnection.dbConnector();
 		java.sql.Statement stmt;
 
 		try {
@@ -574,7 +589,10 @@ public class reportsFrame {
 			addRowsAndColumns(rsTest, dm);
 			reportsTable.setModel(dm);
 			refreshScreen();
-			conn2.close();
+			rsTest.close();
+			stmt.close();
+		
+			
 
 		} catch (Exception e) {
 			JOptionPane.showMessageDialog(null, e);
@@ -584,8 +602,6 @@ public class reportsFrame {
 	public static void All_Associations_By_Name_And_Year(String name, int year) { // NEEDED
 																					// BIG
 																					// TIME
-
-		Connection conn2 = MySQLConnection.dbConnector();
 		java.sql.Statement stmt;
 
 		try {
@@ -605,7 +621,8 @@ public class reportsFrame {
 			addRowsAndColumns(rsTest, dm);
 			reportsTable.setModel(dm);
 			refreshScreen();
-			conn2.close();
+			rsTest.close();
+			stmt.close();
 
 		} catch (Exception e) {
 			JOptionPane.showMessageDialog(null, e);
@@ -614,7 +631,6 @@ public class reportsFrame {
 
 	public static void Association_Name(String name) { // NEEDED BIG TIME
 
-		Connection conn2 = MySQLConnection.dbConnector();
 		java.sql.Statement stmt;
 
 		try {
@@ -630,7 +646,8 @@ public class reportsFrame {
 			addRowsAndColumns(rsTest, dm);
 			reportsTable.setModel(dm);
 			refreshScreen();
-			conn2.close();
+			rsTest.close();
+			stmt.close();
 
 		} catch (Exception e) {
 			JOptionPane.showMessageDialog(null, e);
@@ -639,7 +656,6 @@ public class reportsFrame {
 
 	public static void Everything_By_Year(int year) { // NEEDED BIG TIME
 
-		Connection conn2 = MySQLConnection.dbConnector();
 		java.sql.Statement stmt;
 
 		try {
@@ -654,7 +670,8 @@ public class reportsFrame {
 			addRowsAndColumns(rsTest, dm);
 			reportsTable.setModel(dm);
 			refreshScreen();
-			conn2.close();
+			rsTest.close();
+			stmt.close();
 
 		} catch (Exception e) {
 			JOptionPane.showMessageDialog(null, e);
@@ -664,8 +681,6 @@ public class reportsFrame {
 	public static void All_Associations_By_Year(String type, int year) { // NEEDED
 																			// BIG
 																			// TIME
-
-		Connection conn2 = MySQLConnection.dbConnector();
 		java.sql.Statement stmt;
 
 		try {
@@ -685,7 +700,8 @@ public class reportsFrame {
 			addRowsAndColumns(rsTest, dm);
 			reportsTable.setModel(dm);
 			refreshScreen();
-			conn2.close();
+			rsTest.close();
+			stmt.close();
 
 		} catch (Exception e) {
 			JOptionPane.showMessageDialog(null, e);
@@ -694,7 +710,6 @@ public class reportsFrame {
 
 	public static void Association_Type(String type) { // NEEDED BIG TIME
 
-		Connection conn2 = MySQLConnection.dbConnector();
 		java.sql.Statement stmt;
 
 		try {
@@ -709,17 +724,20 @@ public class reportsFrame {
 			addRowsAndColumns(rsTest, dm);
 			reportsTable.setModel(dm);
 			refreshScreen();
-			conn2.close();
+			rsTest.close();
+			stmt.close();
 
 		} catch (Exception e) {
 			JOptionPane.showMessageDialog(null, e);
 		}
 	}
+	
+	
+	
 
 	// NEEDED BIG TIME
 	public static void Association_By_Type_Name_And_Year(String name, String type, int year) {
 
-		Connection conn2 = MySQLConnection.dbConnector();
 		java.sql.Statement stmt;
 
 		try {
@@ -735,10 +753,55 @@ public class reportsFrame {
 			addRowsAndColumns(rsTest, dm);
 			reportsTable.setModel(dm);
 			refreshScreen();
-			conn2.close();
+			rsTest.close();
+			stmt.close();
 
 		} catch (Exception e) {
 			JOptionPane.showMessageDialog(null, e);
 		}
 	}
+	public void getYearInput()
+	{
+		year.addKeyListener(new KeyAdapter() {
+			public void keyReleased(KeyEvent e) {
+
+				getIntegerInput(year, e);
+
+
+			}
+		});
+	}
+	
+	public void getIntegerInput(JTextField jText, KeyEvent e){
+	    
+		numswap = null;
+		String temp = jText.getText();
+        //only accepts positives doubles
+        
+    
+        String regex = "(?<![-.])\\b[0-9]+\\b(?!\\.[0-9])";
+    
+        //    (?<![-.])   # Assert that the previous character isn't a minus sign or a dot.
+        //    \b          # Anchor the match to the start of a number.
+        //    [0-9]+      # Match a number.
+        //    \b          # Anchor the match to the end of the number.
+        //    (?!\.[0-9]) # Assert that no decimal part follows.
+    
+        if(temp.matches(regex))
+        {
+            numswap = temp;
+
+        }
+        else if((e.getKeyCode() == KeyEvent.VK_BACK_SPACE) || (e.getKeyCode() == KeyEvent.VK_DELETE) 
+                && temp.length() == 0)
+        {//deletes the element in textbox
+            jText.setText("");
+            numswap="";
+        }
+        
+        else{
+            jText.setText(numswap);
+        }
+    }
+
 } // end of ReportsFrame

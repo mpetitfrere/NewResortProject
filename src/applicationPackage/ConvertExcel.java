@@ -90,15 +90,18 @@ public class ConvertExcel {
      *
      *
      */
-    public static void exportExcel(JTable table)throws IOException
+	public static void exportExcel(JTable table)throws IOException
     {
 
         String excelName = excelName();
         File file = new File(excelName);
-        UpDateTable(table);
+        //UpDateTable(table);
         Workbook wb = new XSSFWorkbook(); //Excel workbook
         Sheet sheet = wb.createSheet(); //WorkSheet
-        Row row = sheet.createRow(1); //Row created at line 3
+        //Row row = sheet.createRow(1); //Row created at line 3
+        
+        
+
         TableModel model = table.getModel(); //Table model
 
         Row headerRow = sheet.createRow(0); //Create row at line 0
@@ -106,35 +109,43 @@ public class ConvertExcel {
         for(int headings = 0; headings < model.getColumnCount(); headings++){ //For each column
             headerRow.createCell(headings).setCellValue(model.getColumnName(headings));//Write column name
             colName[headings] = table.getColumnName(headings);
-
         }
+      
+       
+        
+        Row row = sheet.createRow(1); //Row created at line 3
 
 
         for(int rows = 0; rows < model.getRowCount(); rows++){ //For each table row
+        	//Set the row to the next one in the sequence
+            row = sheet.createRow((rows + 1));
             for(int cols = 0; cols < table.getColumnCount(); cols++){ //For each table column
                 if(table.getColumnName(cols).equals(colName[cols]) )
                 {
-                    String columnString = colName[cols];
-                    System.out.println("Col: " + columnString);
+                	 String columnString = colName[cols];
                     if(!isColumnIntType(columnString))
                     {//writes cell as float type to remove error checking in excel
-                        XSSFCell cell = (XSSFCell) row.createCell(cols);//create a cell at the row,col location
+                        XSSFCell cell = (XSSFCell) (row).createCell(cols);//create a cell at the row,col location
                         cell.setCellValue(Float.parseFloat((String) (model.getValueAt(rows, cols))));
-                       //row.createCell(cols).setCellValue(model.getValueAt(rows, cols).toString()); //Write value
+
                     }
                     else//writes the cell as strings
                     {
-                        XSSFCell cell = (XSSFCell) row.createCell(cols);//create a cell at the row,col location
+                        XSSFCell cell = (XSSFCell) headerRow.createCell(cols);//create a cell at the row,col location
                         String x = (String) (model.getValueAt(rows, cols));//get he  value from table
-                        //cell.setCellType(Cell.CELL_TYPE_STRING);
+
                         DataFormatter dfTemp = new DataFormatter();
                         cell.setCellValue(x);
                         cell.setCellValue( dfTemp.formatCellValue(cell));
+                        System.out.println(x);
+
                     }
                 }
             }
             //Set the row to the next one in the sequence
-            row = sheet.createRow((rows + 1));
+            
+
+
         }//end of row loop
         wb.write(new FileOutputStream(file.toString()));//Save the file
         openExcel(file);
@@ -305,7 +316,7 @@ public class ConvertExcel {
         File folder = new File(fileLocation + "/Excel/");
         File[] listOfFiles = folder.listFiles();
 
-        File file = new File("Excel\\\\Form.xlsx");
+        File file = new File("Excel\\\\Form(1).xlsx");
         //File file2 = new File("Excel\\\\Apachi " + date + ".xlsx");
 
         String fileName = fileLocation + "\\\\" + file.toString();
@@ -490,22 +501,7 @@ public class ConvertExcel {
         int rowsCount = row.getRowNum();
 //        String [] colHeader =  new String[size];
         int columnLength = 0;
-//        for(int count = 0; count < size; count++)
-//        {//get column headers from excel
-//            
-//            XSSFCell cell = row.getCell(count);
-//            if (cell.getCellType() == XSSFCell.CELL_TYPE_STRING)
-//            {
-//                System.out.println(cell.getStringCellValue());
-//            }
-//            else if(cell.getCellType() == XSSFCell.CELL_TYPE_NUMERIC)
-//            {
-//                System.out.println(cell.getNumericCellValue()+" ");
-//            }
-////                System.out.println( cell.getStringCellValue());
-////                System.out.println( count);
-////                colHeader[count] = cell.getStringCellValue();        
-//        }
+
 
         //System.out.println("Total Number of Rows: " + (rowsCount + 1));
         int size = 7; //num of  columns
@@ -546,28 +542,31 @@ public class ConvertExcel {
         return true;
 
 
-    }//end of method
-    
-    public static void main(String args[]) throws IOException
-    {
-        //writeExcel();
-        long startTime = System.currentTimeMillis();
-        //JTable table = new JTable();
-        File  file = new File("C:\\Users\\Zelos\\Documents\\GitHub\\SpecsProject\\SpecsProject\\Excel\\ResortExcel.xlsx");
-        
-        try {
-            importExcel(file);
-        } catch (SQLException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        }
-        long endTime   = System.currentTimeMillis();
-        long totalTime = endTime - startTime;
-        SimpleDateFormat sdf = new SimpleDateFormat("mm:ss");
-        Date resultdate = new Date(totalTime);
-        //System.out.println(sdf.format(resultdate));
-        System.out.println("SUCCESS");
-
     }
+}
+    //end of method
+    
 
-}//End of ConvertExcel
+//    public static void main(String args[]) throws IOException
+//    {
+//        //writeExcel();
+//        long startTime = System.currentTimeMillis();
+//        //JTable table = new JTable();
+//        File  file = new File("C:\\Users\\Zelos\\Documents\\GitHub\\SpecsProject\\SpecsProject\\Excel\\ResortExcel.xlsx");
+//        
+//        try {
+//            importExcel(file);
+//        } catch (SQLException e) {
+//            // TODO Auto-generated catch block
+//            e.printStackTrace();
+//        }
+//        long endTime   = System.currentTimeMillis();
+//        long totalTime = endTime - startTime;
+//        SimpleDateFormat sdf = new SimpleDateFormat("mm:ss");
+//        Date resultdate = new Date(totalTime);
+//        //System.out.println(sdf.format(resultdate));
+//        System.out.println("SUCCESS");
+//
+//    }
+
+//}//End of ConvertExcel

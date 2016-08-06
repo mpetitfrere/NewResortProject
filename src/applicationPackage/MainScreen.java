@@ -7,6 +7,8 @@ import javafx.scene.Scene;
 import javafx.scene.chart.*;
 
 import javax.swing.*;
+import javax.swing.plaf.ColorUIResource;
+import javax.swing.plaf.FontUIResource;
 
 import applicationPackage.ExcelFrame;
 import applicationPackage.InsertWindow;
@@ -42,9 +44,13 @@ public class MainScreen extends JApplet {
 		});
 	}
 
+
 	public MainScreen() throws URISyntaxException {
 		super();
 		connection = MySQLConnection.dbConnector();
+		UIManager.put("ToolTip.foreground", new ColorUIResource(Color.WHITE));
+		UIManager.put("ToolTip.background", new ColorUIResource(new Color(0, 155, 167)));
+		UIManager.put("ToolTip.font", new FontUIResource("Segoe UI Semilight", Font.BOLD, 20));
 		init();
 	}
 
@@ -73,6 +79,7 @@ public class MainScreen extends JApplet {
 		frame.getContentPane().add(Logo_MainScreen);
 
 		JLabel reportsIcon = new JLabel("");
+		reportsIcon.setToolTipText("Locate A Box In Warehouse");
 		reportsIcon.setHorizontalAlignment(SwingConstants.CENTER);
 		reportsIcon.setIcon(new ImageIcon(MainScreen.class.getResource("/Resources/fileFinderIcon.jpg")));
 		reportsIcon.setBounds(59, 250, 394, 310);
@@ -104,6 +111,7 @@ public class MainScreen extends JApplet {
 		});
 
 		JLabel insertIcon = new JLabel("");
+		insertIcon.setToolTipText("Add A Box To Database");
 		insertIcon.setIcon(new ImageIcon(MainScreen.class.getResource("/Resources/addFileIcon.jpg")));
 		insertIcon.setHorizontalAlignment(SwingConstants.CENTER);
 		insertIcon.setBounds(512, 250, 394, 301);
@@ -133,24 +141,25 @@ public class MainScreen extends JApplet {
 			}
 		});
 
-		JLabel infoGraphIcon = new JLabel("");
-		infoGraphIcon.setIcon(new ImageIcon(MainScreen.class.getResource("/Resources/excelIcon.jpg")));
-		infoGraphIcon.setHorizontalAlignment(SwingConstants.CENTER);
-		infoGraphIcon.setBounds(965, 250, 394, 301);
-		frame.getContentPane().add(infoGraphIcon);
+		JLabel excelIcon = new JLabel("");
+		excelIcon.setToolTipText("Import and Export From Excel");
+		excelIcon.setIcon(new ImageIcon(MainScreen.class.getResource("/Resources/excelIcon.jpg")));
+		excelIcon.setHorizontalAlignment(SwingConstants.CENTER);
+		excelIcon.setBounds(965, 250, 394, 301);
+		frame.getContentPane().add(excelIcon);
 		
 		
-		infoGraphIcon.addMouseListener(new MouseAdapter() {
+		excelIcon.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseEntered(MouseEvent e) {
 				// helpIconLabel.setCursor(new Cursor(Cursor.HAND_CURSOR));
-				infoGraphIcon.setIcon(new ImageIcon(MainScreen.class.getResource("/Resources/excelIcon_Hover.jpg")));
+				excelIcon.setIcon(new ImageIcon(MainScreen.class.getResource("/Resources/excelIcon_Hover.jpg")));
 
 			}
 
 			@Override
 			public void mouseExited(MouseEvent e) {
-				infoGraphIcon.setIcon(new ImageIcon(MainScreen.class.getResource("/Resources/excelIcon.jpg")));
+				excelIcon.setIcon(new ImageIcon(MainScreen.class.getResource("/Resources/excelIcon.jpg")));
 			}
 
 			@Override
