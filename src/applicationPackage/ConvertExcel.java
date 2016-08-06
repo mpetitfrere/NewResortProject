@@ -90,15 +90,16 @@ public class ConvertExcel {
      *
      *
      */
-    public static void exportExcel(JTable table)throws IOException
+	public static void exportExcel(JTable table)throws IOException
     {
 
         String excelName = excelName();
         File file = new File(excelName);
-        UpDateTable(table);
+
         Workbook wb = new XSSFWorkbook(); //Excel workbook
         Sheet sheet = wb.createSheet(); //WorkSheet
-        Row row = sheet.createRow(1); //Row created at line 3
+        
+
         TableModel model = table.getModel(); //Table model
 
         Row headerRow = sheet.createRow(0); //Create row at line 0
@@ -108,33 +109,38 @@ public class ConvertExcel {
             colName[headings] = table.getColumnName(headings);
 
         }
+        
+        Row row = sheet.createRow(1); //Row created at line 3
 
 
         for(int rows = 0; rows < model.getRowCount(); rows++){ //For each table row
+        	//Set the row to the next one in the sequence
+            row = sheet.createRow((rows + 1));
             for(int cols = 0; cols < table.getColumnCount(); cols++){ //For each table column
                 if(table.getColumnName(cols).equals(colName[cols]) )
                 {
                     String columnString = colName[cols];
-                    System.out.println("Col: " + columnString);
+
                     if(!isColumnIntType(columnString))
                     {//writes cell as float type to remove error checking in excel
-                        XSSFCell cell = (XSSFCell) row.createCell(cols);//create a cell at the row,col location
+                        XSSFCell cell = (XSSFCell) (row).createCell(cols);//create a cell at the row,col location
                         cell.setCellValue(Float.parseFloat((String) (model.getValueAt(rows, cols))));
-                       //row.createCell(cols).setCellValue(model.getValueAt(rows, cols).toString()); //Write value
+
                     }
                     else//writes the cell as strings
                     {
                         XSSFCell cell = (XSSFCell) row.createCell(cols);//create a cell at the row,col location
                         String x = (String) (model.getValueAt(rows, cols));//get he  value from table
-                        //cell.setCellType(Cell.CELL_TYPE_STRING);
+
                         DataFormatter dfTemp = new DataFormatter();
                         cell.setCellValue(x);
                         cell.setCellValue( dfTemp.formatCellValue(cell));
                     }
                 }
             }
-            //Set the row to the next one in the sequence
-            row = sheet.createRow((rows + 1));
+            
+
+
         }//end of row loop
         wb.write(new FileOutputStream(file.toString()));//Save the file
         openExcel(file);
@@ -567,6 +573,7 @@ public class ConvertExcel {
         Date resultdate = new Date(totalTime);
         //System.out.println(sdf.format(resultdate));
         System.out.println("SUCCESS");
+
 
     }
 
