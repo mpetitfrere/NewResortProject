@@ -236,7 +236,6 @@ public class InsertWindow {
                             }
 
                         }
-                       // e.printStackTrace();
                     }    
                 }
             }
@@ -591,8 +590,8 @@ public class InsertWindow {
         testTable.getColumnModel().getColumn(2).setPreferredWidth(120);
         testTable.getColumnModel().getColumn(3).setPreferredWidth(100);
         testTable.getColumnModel().getColumn(4).setPreferredWidth(100);
-        testTable.getColumnModel().getColumn(5).setPreferredWidth(120);
-        testTable.getColumnModel().getColumn(6).setPreferredWidth(120);
+        testTable.getColumnModel().getColumn(5).setPreferredWidth(100);
+        testTable.getColumnModel().getColumn(6).setPreferredWidth(100);
     }
     
     private void addTextBoxFields()
@@ -608,7 +607,7 @@ public class InsertWindow {
         };
         int i=0;
         while (i < fields.length) {
-            JLabel label = new JLabel((String) fields[i++], JLabel.RIGHT);
+            JLabel label = new JLabel((String) fields[i++], JLabel.CENTER);
             label.setFont(new Font("Segoe UI Semilight", Font.PLAIN, 20));
             g1_Jpanel.add(label);
             g1_Jpanel.add((Component) fields[i++]);
@@ -957,6 +956,5 @@ public class InsertWindow {
     public void setPrepareField7() throws NumberFormatException, SQLException
     {
         prepare.setString(Integer.parseInt(field7.getName()), field7.getSelectedItem().toString());
-
     }
 }
