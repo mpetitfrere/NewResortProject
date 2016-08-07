@@ -111,10 +111,6 @@ public class ConvertExcel {
             colName[headings] = table.getColumnName(headings);
         }
       
-       
-        
-
-
         for(int rows = 0; rows < model.getRowCount(); rows++){ //For each table row
         	//Set the row to the next one in the sequence
         	headerRow = sheet.createRow((rows + 1));
@@ -136,13 +132,10 @@ public class ConvertExcel {
                         DataFormatter dfTemp = new DataFormatter();
                         cell.setCellValue(x);
                         cell.setCellValue( dfTemp.formatCellValue(cell));
-                        System.out.println(x);
-
                     }
                 }
             }
-            //Set the row to the next one in the sequence
-            
+            //Set the row to the next one in the sequence          
 
 
         }//end of row loop
