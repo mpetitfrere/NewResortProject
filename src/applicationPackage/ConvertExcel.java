@@ -113,19 +113,18 @@ public class ConvertExcel {
       
        
         
-        Row row = sheet.createRow(1); //Row created at line 3
 
 
         for(int rows = 0; rows < model.getRowCount(); rows++){ //For each table row
         	//Set the row to the next one in the sequence
-            row = sheet.createRow((rows + 1));
+        	headerRow = sheet.createRow((rows + 1));
             for(int cols = 0; cols < table.getColumnCount(); cols++){ //For each table column
                 if(table.getColumnName(cols).equals(colName[cols]) )
                 {
                 	 String columnString = colName[cols];
                     if(!isColumnIntType(columnString))
                     {//writes cell as float type to remove error checking in excel
-                        XSSFCell cell = (XSSFCell) (row).createCell(cols);//create a cell at the row,col location
+                        XSSFCell cell = (XSSFCell) (headerRow).createCell(cols);//create a cell at the row,col location
                         cell.setCellValue(Float.parseFloat((String) (model.getValueAt(rows, cols))));
 
                     }
