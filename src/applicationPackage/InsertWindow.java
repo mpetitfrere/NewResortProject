@@ -182,13 +182,13 @@ public class InsertWindow {
                 clearFields();
             }
         });
-        excelBtn.addActionListener(new ActionListener() {
+        /*excelBtn.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 ExcelFrame frame = new ExcelFrame();
                 frmInsertAsset.setVisible(false);
                 frame.setVisible(true);
             }
-        });
+        });*/
         insertBtn.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 insertToDB();
@@ -768,7 +768,7 @@ public class InsertWindow {
         });
         springLayout.putConstraint(SpringLayout.NORTH, updateBtn, 0, SpringLayout.NORTH, insertBtn);
         updateBtn.setSize(180, 38);
-        clearBtn.setSize(148, 38);
+        clearBtn.setSize(448, 38);
         //Button Insert
         btnInsert.setLocation(15, 662);
         btnInsert.setFont(new Font("Segoe UI Semilight", Font.PLAIN, 22));
@@ -776,17 +776,17 @@ public class InsertWindow {
         btnUpdate.setLocation(275, 662);
         btnUpdate.setFont(new Font("Segoe UI Semilight", Font.PLAIN, 22));
         frmInsertAsset.getContentPane().add(btnUpdate);
-        btnClear.setLocation(413, 653);
+        btnClear.setLocation(913, 653);
         btnClear.setFont(new Font("Segoe UI Semilight", Font.PLAIN, 22));
         frmInsertAsset.getContentPane().add(btnClear);
         springLayout.putConstraint(SpringLayout.WEST, updateBtn, 70, SpringLayout.EAST, insertBtn);
         springLayout.putConstraint(SpringLayout.EAST, updateBtn, 218, SpringLayout.EAST, insertBtn);
         
         excelBtn.setFont(new Font("Segoe UI Semilight", Font.PLAIN, 22));
-        frmInsertAsset.getContentPane().add(excelBtn);
+        //frmInsertAsset.getContentPane().add(excelBtn);
         springLayout.putConstraint(SpringLayout.WEST, clearBtn, 125, SpringLayout.WEST, frmInsertAsset.getContentPane());
         springLayout.putConstraint(SpringLayout.SOUTH, clearBtn, 16, SpringLayout.SOUTH, scrollPane_1);
-        springLayout.putConstraint(SpringLayout.EAST, clearBtn, -399, SpringLayout.WEST, scrollPane_1);
+        springLayout.putConstraint(SpringLayout.EAST, clearBtn, -199, SpringLayout.WEST, scrollPane_1);
         
         springLayout.putConstraint(SpringLayout.NORTH, clearBtn, 17, SpringLayout.SOUTH, insertBtn);
         
