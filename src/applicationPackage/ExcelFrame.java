@@ -59,7 +59,9 @@ public class ExcelFrame extends JFrame {
      */
     public ExcelFrame() {
     	
-
+    	UIManager.put("ToolTip.foreground", new ColorUIResource(Color.WHITE));
+		UIManager.put("ToolTip.background", new ColorUIResource(new Color(0, 155, 167)));
+		UIManager.put("ToolTip.font", new FontUIResource("Segoe UI Semilight", Font.BOLD, 20));
 
     	addWindowListener(new WindowAdapter()
         {
@@ -86,9 +88,7 @@ public class ExcelFrame extends JFrame {
         setLocationRelativeTo(null);
         //ImageIcon icon = new ImageIcon(getClass().getResource("/Resources/appIconImage.png"));
 
-		UIManager.put("ToolTip.foreground", new ColorUIResource(Color.WHITE));
-		UIManager.put("ToolTip.background", new ColorUIResource(new Color(0, 155, 167)));
-		UIManager.put("ToolTip.font", new FontUIResource("Segoe UI Semilight", Font.BOLD, 20));
+		
 
 
         final JFileChooser fc = new JFileChooser();
