@@ -405,13 +405,134 @@ public class reportsFrame {
 
 		// Print button for reports
 		JButton btnPrint = new JButton("Print");
+		btnPrint.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				MessageFormat footer1 = new MessageFormat("A-Team Studios ");
+				// MessageFormat header = new MessageFormat("Company Assets");
+				MessageFormat header;
+
+				try {
+
+					int Year = 0;
+					String Name = resortName.getText().trim();
+
+					if (!(year.getText().isEmpty()))
+						Year = Integer.parseInt(year.getText().trim());
+
+					String Container = (String) type.getSelectedItem();
+
+					// Returns All Package Types By Year For All Associations
+
+					if (resortName.getText().isEmpty() && !(year.getText().isEmpty()) // WORKED
+							&& type.getSelectedItem().equals("All")) {
+
+						// System.out.println("All Packages Specific Year");
+
+						header = new MessageFormat("Assets " + "\n");
+						reportsTable.print(JTable.PrintMode.FIT_WIDTH, header, footer1);
+
+					}
+					// Returns Specific Package Type By Year Without Association
+
+					else if (resortName.getText().isEmpty() && !(year.getText().isEmpty()) // WORKED
+							&& !(type.getSelectedItem().equals("All"))) {
+
+						// System.out.println("No Association Specific Package
+						// Specific Year");
+
+						header = new MessageFormat("Assets " + "\n");
+						reportsTable.print(JTable.PrintMode.FIT_WIDTH, header, footer1);
+
+					}
+
+					// Returns Specified Package Type For All Years For A
+					// Specified Association
+					else if (!(resortName.getText().isEmpty()) && year.getText().isEmpty() // WORKED
+							&& !(type.getSelectedItem().equals("All"))) {
+
+						// System.out.println("Association Name, All Year and
+						// All Packaging");
+						// Association
+
+						header = new MessageFormat("Assets " + "\n");
+						reportsTable.print(JTable.PrintMode.FIT_WIDTH, header, footer1);
+					}
+
+					// Returns All Package Types For All Years For A Specified
+					// Name
+					else if (!(resortName.getText().isEmpty()) && year.getText().isEmpty()
+							&& type.getSelectedItem().equals("All")) {
+
+						// System.out.println("Specific Association Name, All
+						// Years All Packaging");
+						header = new MessageFormat("Assets " + "\n");
+						reportsTable.print(JTable.PrintMode.FIT_WIDTH, header, footer1);
+					}
+
+					// Returns All Packages Types For Association For A
+					// Specified Year
+					else if (!(resortName.getText().isEmpty()) && !(year.getText().isEmpty()) // WORKED
+							&& type.getSelectedItem().equals("All")) {
+
+						// System.out.println("Specific Association Name,
+						// Specific Year All Packaging");
+						header = new MessageFormat("Assets " + "\n");
+						reportsTable.print(JTable.PrintMode.FIT_WIDTH, header, footer1);
+					}
+
+					// Returns Specified Package Type For Association For A
+					// Specified Year
+					else if (!(resortName.getText().isEmpty()) && !(year.getText().isEmpty()) // WORKED
+							&& !(type.getSelectedItem().equals("All"))) {
+
+						// System.out.println("Specific Association Name,
+						// Specific Specific Packaging");
+
+						header = new MessageFormat("Assets " + "\n");
+						reportsTable.print(JTable.PrintMode.FIT_WIDTH, header, footer1);
+
+					}
+
+					// Returns All Package Types For All Associations For All
+					// Years
+
+					else if (resortName.getText().isEmpty() && year.getText().isEmpty() // WORKED
+							&& type.getSelectedItem().equals("All")) {
+
+						// System.out.println("Everything");
+
+						header = new MessageFormat("Assets " + "\n");
+						reportsTable.print(JTable.PrintMode.FIT_WIDTH, header, footer1);
+
+					}
+
+					// Returns Specified Package Type For All Associations For
+					// All Years
+					else if (resortName.getText().isEmpty() && year.getText().isEmpty() // WORKED
+							&& !(type.getSelectedItem().equals("All"))) {
+
+						// System.out.println("Speciic package every association
+						// every year");
+
+						header = new MessageFormat("Assets " + "\n");
+						reportsTable.print(JTable.PrintMode.FIT_WIDTH, header, footer1);
+					}
+
+				}
+
+				catch (PrinterException e1) {
+
+					e1.printStackTrace();
+				}
+			}
+		});
 		buttonPanel.add(btnPrint);
 		springLayout.putConstraint(SpringLayout.WEST, btnPrint, 750, SpringLayout.WEST, reportFrame.getContentPane());
 		springLayout.putConstraint(SpringLayout.NORTH, btnPrint, 23, SpringLayout.SOUTH, scrollPane_1);
 		springLayout.putConstraint(SpringLayout.SOUTH, btnPrint, -28, SpringLayout.SOUTH, reportFrame.getContentPane());
 		btnPrint.setFont(new Font("Segoe UI Semilight", Font.PLAIN, 22));
 
-
+		
 
 		//Export to Excel Button
 		JButton btnExportToExcel = new JButton("Export to Excel");
