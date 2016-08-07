@@ -205,6 +205,7 @@ public class InsertWindow {
                         clearFields();
                         UpDateTable();
                         addTypes();
+                        setPrepareField7();
                         JOptionPane.showMessageDialog(null, "Successfully inserted into database.", "Success" , JOptionPane.INFORMATION_MESSAGE);
 
                     } catch (SQLException e) {
@@ -954,5 +955,10 @@ public class InsertWindow {
         prepare.setInt(5, Integer.parseInt(field5.getText()));
         prepare.setInt(6, Integer.parseInt(field6.getText()));
         prepare.setString(7, field7.getSelectedItem().toString());
+    }
+    public void setPrepareField7() throws NumberFormatException, SQLException
+    {
+        prepare.setString(Integer.parseInt(field7.getName()), field7.getSelectedItem().toString());
+
     }
 }
