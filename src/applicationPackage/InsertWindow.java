@@ -74,7 +74,7 @@ public class InsertWindow {
     private String numSwap;
     private String autoIDString;
     private String deleteItemString;
-    private int    boxIndex;
+ 
 
     // instantiating textfields for each jlabel
     private JTextField field1 = new JTextField();
@@ -120,9 +120,7 @@ public class InsertWindow {
         UIManager.put("OptionPane.messageFont", new FontUIResource(new Font("Segoe UI Semilight", Font.PLAIN, 20)));
         initialize();
         //UpDateTable();
-        
-        
-        
+
     }
 
     
@@ -238,7 +236,6 @@ public class InsertWindow {
                             }
 
                         }
-                       // e.printStackTrace();
                     }    
                 }
             }
@@ -423,7 +420,6 @@ public class InsertWindow {
     
     private void getTypes() throws SQLException {
         //field3
-        field3.setSelectedIndex(boxIndex);//sets the Type to ArtWork
         prepare.setString(3, field3.getSelectedItem().toString());
 
         field3.addItemListener(new ItemListener() {
@@ -594,8 +590,8 @@ public class InsertWindow {
         testTable.getColumnModel().getColumn(2).setPreferredWidth(120);
         testTable.getColumnModel().getColumn(3).setPreferredWidth(100);
         testTable.getColumnModel().getColumn(4).setPreferredWidth(100);
-        testTable.getColumnModel().getColumn(5).setPreferredWidth(120);
-        testTable.getColumnModel().getColumn(6).setPreferredWidth(120);
+        testTable.getColumnModel().getColumn(5).setPreferredWidth(100);
+        testTable.getColumnModel().getColumn(6).setPreferredWidth(100);
     }
     
     private void addTextBoxFields()
@@ -611,7 +607,7 @@ public class InsertWindow {
         };
         int i=0;
         while (i < fields.length) {
-            JLabel label = new JLabel((String) fields[i++], JLabel.RIGHT);
+            JLabel label = new JLabel((String) fields[i++], JLabel.CENTER);
             label.setFont(new Font("Segoe UI Semilight", Font.PLAIN, 20));
             g1_Jpanel.add(label);
             g1_Jpanel.add((Component) fields[i++]);
@@ -863,10 +859,11 @@ public class InsertWindow {
             field3.addItem(str);
             if(str.equals("Box"))
             {
-                boxIndex = count;
+                field3.setSelectedIndex(count);//sets the Type to ArtWork
             }
             count++;
-        }    
+        }
+
     }
     private void setTextFieldName()
     {
@@ -959,6 +956,5 @@ public class InsertWindow {
     public void setPrepareField7() throws NumberFormatException, SQLException
     {
         prepare.setString(Integer.parseInt(field7.getName()), field7.getSelectedItem().toString());
-
     }
 }
