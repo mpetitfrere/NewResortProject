@@ -28,7 +28,7 @@ import java.util.Iterator;
  */
 public class ConvertExcel {
 
-    public static void exportExcel(boolean templateState)throws IOException
+    public static void exportExcel(boolean templateState)throws IOException, SQLException
     {
         JTable table = new JTable();
         DateTime dt = new DateTime();
