@@ -511,7 +511,6 @@ public class ConvertExcel {
                     if(j==size-1)//num of columns in database
                     {
                         prepare.executeUpdate();
-                        prepare.getConnection().commit();
                     }
                 }
                 else
@@ -526,6 +525,9 @@ public class ConvertExcel {
             }// end of j loop
             
         }//end of i loop
+        
+        prepare.getConnection().commit();
+        prepare.close();
         try {
             file.close();
         } catch (IOException e1) {
