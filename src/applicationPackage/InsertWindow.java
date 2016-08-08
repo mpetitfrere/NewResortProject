@@ -254,6 +254,7 @@ public class InsertWindow {
             
                 PreparedStatement prepareDel = conn.prepareStatement(deleteItemString);
                 prepareDel.executeUpdate();
+                prepareDel.getConnection().commit();
                 UpDateTable();
                 JOptionPane.showMessageDialog(null, "Successfully deleted item: " + field1.getText());
                 prepareDel.close();
@@ -287,6 +288,7 @@ public class InsertWindow {
                 + "WHERE `ID`='" + String.valueOf(ID)+ "'";
         PreparedStatement prepareUpdate = conn.prepareStatement(updateFieldsSQL);
         prepareUpdate.executeUpdate();
+        prepareUpdate.getConnection().commit();
         //System.out.println(ID);
         UpDateTable();
         clearFields();

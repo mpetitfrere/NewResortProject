@@ -150,7 +150,7 @@ public class ExcelFrame extends JFrame {
                                 JOptionPane.showMessageDialog(null, "Internet connection was lost. Please try again.");
                             }
                             else{
-                                JOptionPane.showMessageDialog(contentPane, "Import failed. Please fix your file and reimport.", 
+                                JOptionPane.showMessageDialog(contentPane, e1.getMessage(), 
                                         "ERROR", JOptionPane.ERROR_MESSAGE);
                             }
                             
