@@ -666,8 +666,6 @@ public class InsertWindow {
 				deleteItemString = "delete FROM new_schema.ResortManagement WHERE `Aisle` ='" + field4.getText() + "' "
 						+ " AND `Row` = '" + field5.getText() + "' " + "AND `Column` ='" + field6.getText() + "' "
 						+ "AND `Depth` ='" + field7.getSelectedItem().toString() + "'";
-				
-				System.out.println(deleteItemString);
 
 				try {
 					getPrepareValues();

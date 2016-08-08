@@ -62,155 +62,175 @@ public class ExcelFrame extends JFrame {
 		UIManager.put("ToolTip.background", new ColorUIResource(new Color(0, 155, 167)));
 		UIManager.put("ToolTip.font", new FontUIResource("Segoe UI Semilight", Font.BOLD, 20));
 
-		addWindowListener(new WindowAdapter() {
-			@Override
-			public void windowClosing(WindowEvent e) {
-				// System.out.println("Closed");
-				MainScreen.frame.setVisible(true);
-				dispose();
 
-			}
-		});
-		setVisible(true);
-		setLocationRelativeTo(null);
-		setIconImage(
-				Toolkit.getDefaultToolkit().getImage(ExcelFrame.class.getResource("/Resources/appIconImage-2.png")));
-		setTitle("Excel Options");
-		setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-		// setBounds(100, 100, 905, 330);
-		setSize(905, 330);
-		contentPane = new JPanel();
-		contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
-		contentPane.setBackground(new Color(244, 244, 244));
-		setContentPane(contentPane);
-		setLocationRelativeTo(null);
-		// ImageIcon icon = new
-		// ImageIcon(getClass().getResource("/Resources/appIconImage.png"));
+    	addWindowListener(new WindowAdapter()
+        {
+            @Override
+            public void windowClosing(WindowEvent e)
+            {
+                //System.out.println("Closed");
+                MainScreen.frame.setVisible(true);
+                dispose();
 
-		final JFileChooser fc = new JFileChooser();
-		fc.setFileFilter(new ExcelFilter());
+            }
+        });
+    	setVisible(true);
+        setLocationRelativeTo(null);
+        setIconImage(Toolkit.getDefaultToolkit().getImage(ExcelFrame.class.getResource("/Resources/appIconImage-2.png")));
+        setTitle("Excel Options");
+        setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+        //setBounds(100, 100, 905, 330);
+        setSize(905,330);
+        contentPane = new JPanel();
+        contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
+        contentPane.setBackground(new Color(244, 244, 244));
+        setContentPane(contentPane);
+        setLocationRelativeTo(null);
+        //ImageIcon icon = new ImageIcon(getClass().getResource("/Resources/appIconImage.png"));
 
-		JLabel btnImportExcel = new JLabel("");
-		btnImportExcel.setIcon(new ImageIcon(ExcelFrame.class.getResource("/Resources/importIcon.jpg")));
-		btnImportExcel.setToolTipText("Inserts Excel files to database.");
-		btnImportExcel.addFocusListener(new FocusAdapter() {
+		
 
-		});
-		btnImportExcel.addMouseListener(new MouseAdapter() {
 
-			@Override
-			public void mouseEntered(MouseEvent arg0) {
-				// btnImportExcel.setCursor(new Cursor(Cursor.HAND_CURSOR));
-				btnImportExcel.setIcon(new ImageIcon(ExcelFrame.class.getResource("/Resources/importIcon_Hover.jpg")));
-			}
+        final JFileChooser fc = new JFileChooser();
+        fc.setFileFilter(new ExcelFilter());
 
-			@Override
-			public void mouseExited(MouseEvent e) {
-				btnImportExcel.setIcon(new ImageIcon(ExcelFrame.class.getResource("/Resources/importIcon.jpg")));
-			}
 
-			@Override
-			public void mouseClicked(MouseEvent e) {
+        JLabel btnImportExcel = new JLabel("");
+        btnImportExcel.setIcon(new ImageIcon(ExcelFrame.class.getResource("/Resources/importIcon.jpg")));
+        btnImportExcel.setToolTipText("Inserts Excel files to database.");
+        btnImportExcel.addFocusListener(new FocusAdapter() {
 
-				// Handle open button action.
-				if (e.getSource() == btnImportExcel) {
-					int returnVal = fc.showOpenDialog(btnImportExcel);
-					if (returnVal == JFileChooser.APPROVE_OPTION) {
-						File file = fc.getSelectedFile();
-						try {
-							long startTime = System.currentTimeMillis();
-							if (ConvertExcel.importExcel(file)) {
+        });
+        btnImportExcel.addMouseListener(new MouseAdapter() {
+            
+            @Override
+            public void mouseEntered(MouseEvent arg0) {
+                //btnImportExcel.setCursor(new Cursor(Cursor.HAND_CURSOR));
+                btnImportExcel.setIcon(new ImageIcon(ExcelFrame.class.getResource("/Resources/importIcon_Hover.jpg")));
+            }
+            @Override
+            public void mouseExited(MouseEvent e) {
+                btnImportExcel.setIcon(new ImageIcon(ExcelFrame.class.getResource("/Resources/importIcon.jpg")));
+            }
+            
+            @Override
+            public void mouseClicked(MouseEvent e) {
 
-								long endTime = System.currentTimeMillis();
-								long totalTime = endTime - startTime;
-								SimpleDateFormat sdf = new SimpleDateFormat("mm:ss");
-								Date resultdate = new Date(totalTime);
-								JOptionPane.showMessageDialog(
-										contentPane, "Successfully imported " + file.getName() + " to database."
-												+ "\nTime: " + sdf.format(resultdate),
-										"Import", JOptionPane.INFORMATION_MESSAGE);
-							}
-						} catch (SQLException e1) {
+                //Handle open button action.
+                if (e.getSource() == btnImportExcel) {
+                    int returnVal = fc.showOpenDialog(btnImportExcel);
+                    if (returnVal == JFileChooser.APPROVE_OPTION) {
+                        File file = fc.getSelectedFile();
+                        try {
+                            long startTime = System.currentTimeMillis();
+                            if(ConvertExcel.importExcel(file))
+                            {
+                                
+                                long endTime   = System.currentTimeMillis();
+                                long totalTime = endTime - startTime;
+                                SimpleDateFormat sdf = new SimpleDateFormat("mm:ss");
+                                Date resultdate = new Date(totalTime);
+                                JOptionPane.showMessageDialog(contentPane,
+                                        "Successfully imported " + file.getName() +" to database."
+                                                +"\nTime: " + sdf.format(resultdate) ,
+                                                "Import",
+                                                JOptionPane.INFORMATION_MESSAGE
+                                        ); 
+                            }
+                        } catch (SQLException e1) {
+                        
+                            if(e1.getMessage().contains("key 'LOCATION'"))
+                            {
+                                String duplicateItem = e1.getMessage();
+                                JOptionPane.showMessageDialog(contentPane, duplicateItem + "\nWhere Aisle-Row-Column-Depth", 
+                                        "Duplicated Location", JOptionPane.ERROR_MESSAGE);    
+                            }
+                            else if(e1.getMessage().contains("Communications link failure"))
+                            {
+                                JOptionPane.showMessageDialog(null, "Internet connection was lost. Please try again.");
+                            }
+                            else{
+                                JOptionPane.showMessageDialog(contentPane, e1.getMessage(), 
+                                        "ERROR", JOptionPane.ERROR_MESSAGE);
+                            }
+                            
+                            e1.printStackTrace();
+                        }
+                        
+                    }
 
-							if (e1.getMessage().contains("key 'LOCATION'")) {
-								String duplicateItem = e1.getMessage();
-								JOptionPane.showMessageDialog(contentPane,
-										duplicateItem + "\nWhere Aisle-Row-Column-Depth", "Duplicated Location",
-										JOptionPane.ERROR_MESSAGE);
-							} else {
-								JOptionPane.showMessageDialog(contentPane,
-										"Import failed. Please fix your file and reimport.", "ERROR",
-										JOptionPane.ERROR_MESSAGE);
-							}
+                  
+            }          
 
-							e1.printStackTrace();
-						}
+        }});
 
-					}
+        JLabel btnExportExcel = new JLabel("");
+        btnExportExcel.setIcon(new ImageIcon(ExcelFrame.class.getResource("/Resources/exportIcon.jpg")));
+        btnExportExcel.setToolTipText("Exports all data from database into an excel file.");
+        btnExportExcel.addMouseListener(new MouseAdapter() {
+            
+            @Override
+            public void mouseEntered(MouseEvent arg0) {
+                //btnImportExcel.setCursor(new Cursor(Cursor.HAND_CURSOR));
+                btnExportExcel.setIcon(new ImageIcon(ExcelFrame.class.getResource("/Resources/exportIcon_Hover.jpg")));
+            }
+            @Override
+            public void mouseExited(MouseEvent e) {
+                btnExportExcel.setIcon(new ImageIcon(ExcelFrame.class.getResource("/Resources/exportIcon.jpg")));
+            }
+            
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                try {
+                	
+                    ConvertExcel.exportExcel(false);
 
-				}
 
-			}
-		});
 
-		JLabel btnExportExcel = new JLabel("");
-		btnExportExcel.setIcon(new ImageIcon(ExcelFrame.class.getResource("/Resources/exportIcon.jpg")));
-		btnExportExcel.setToolTipText("Exports all data from database into an excel file.");
-		btnExportExcel.addMouseListener(new MouseAdapter() {
 
-			@Override
-			public void mouseEntered(MouseEvent arg0) {
-				// btnImportExcel.setCursor(new Cursor(Cursor.HAND_CURSOR));
-				btnExportExcel.setIcon(new ImageIcon(ExcelFrame.class.getResource("/Resources/exportIcon_Hover.jpg")));
-			}
+                } catch (IOException | SQLException e1) {
+                	 if(e1.getMessage().contains("Communications link failure"))
+                     {
+                         JOptionPane.showMessageDialog(null, "Internet connection was lost. Please try again.");
+                     }
+                
 
-			@Override
-			public void mouseExited(MouseEvent e) {
-				btnExportExcel.setIcon(new ImageIcon(ExcelFrame.class.getResource("/Resources/exportIcon.jpg")));
-			}
+                
+                }
+            }
+        });
 
-			@Override
-			public void mouseClicked(MouseEvent e) {
-				try {
-					ConvertExcel.exportExcel(false);
-
-				} catch (IOException e1) {
-					e1.printStackTrace();
-
-				}
-			}
-		});
-
-		JLabel buttonExcelTemplate = new JLabel("");
-		buttonExcelTemplate.setIcon(new ImageIcon(ExcelFrame.class.getResource("/Resources/templateIcon.jpg")));
-		buttonExcelTemplate.addMouseListener(new MouseAdapter() {
-
-			@Override
-			public void mouseEntered(MouseEvent arg0) {
-				// btnImportExcel.setCursor(new Cursor(Cursor.HAND_CURSOR));
-				buttonExcelTemplate
-						.setIcon(new ImageIcon(ExcelFrame.class.getResource("/Resources/templateIcon_Hover.jpg")));
-			}
-
-			@Override
-			public void mouseExited(MouseEvent e) {
-				buttonExcelTemplate.setIcon(new ImageIcon(ExcelFrame.class.getResource("/Resources/templateIcon.jpg")));
-			}
-
-			@Override
-			public void mouseClicked(MouseEvent e) {
-				try {
-					ConvertExcel.exportExcel(true);
-				} catch (IOException e1) {
-					// TODO Auto-generated catch block
-					e1.printStackTrace();
-				}
-			}
-		});
-		buttonExcelTemplate.setToolTipText("Opens a template in Excel to import file.");
-		contentPane.setLayout(new FlowLayout(FlowLayout.LEFT, 5, 5));
-		contentPane.add(btnExportExcel);
-		contentPane.add(buttonExcelTemplate);
-		contentPane.add(btnImportExcel);
-	}
+        JLabel buttonExcelTemplate = new JLabel("");
+        buttonExcelTemplate.setIcon(new ImageIcon(ExcelFrame.class.getResource("/Resources/templateIcon.jpg")));
+        buttonExcelTemplate.addMouseListener(new MouseAdapter() {
+            
+            @Override
+            public void mouseEntered(MouseEvent arg0) {
+                //btnImportExcel.setCursor(new Cursor(Cursor.HAND_CURSOR));
+                buttonExcelTemplate.setIcon(new ImageIcon(ExcelFrame.class.getResource("/Resources/templateIcon_Hover.jpg")));
+            }
+            @Override
+            public void mouseExited(MouseEvent e) {
+                buttonExcelTemplate.setIcon(new ImageIcon(ExcelFrame.class.getResource("/Resources/templateIcon.jpg")));
+            }
+            
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                try {
+                    ConvertExcel.exportExcel(true);
+                } catch (IOException | SQLException e1) {
+                    // TODO Auto-generated catch block
+                	 if(e1.getMessage().contains("Communications link failure"))
+                     {
+                         JOptionPane.showMessageDialog(null, "Internet connection was lost. Please try again.");
+                     }
+                }
+            }
+        });
+        buttonExcelTemplate.setToolTipText("Opens a template in Excel to import file.");
+        contentPane.setLayout(new FlowLayout(FlowLayout.LEFT, 5, 5));
+        contentPane.add(btnExportExcel);
+        contentPane.add(buttonExcelTemplate);
+        contentPane.add(btnImportExcel);        
+    }
 }
