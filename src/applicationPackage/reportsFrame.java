@@ -74,8 +74,7 @@ public class reportsFrame {
 
 	private JFrame reportFrame;
 	private static JTable reportsTable;
-	private static Connection conn2;
-;
+	private static Connection conn2;;
 	// instantiating textfields for each jlabel
 	JTextField resortName = new JTextField();
 	JTextField year = new JTextField();
@@ -94,7 +93,8 @@ public class reportsFrame {
 		EventQueue.invokeLater(new Runnable() {
 			public void run() {
 				try {
-					UIManager.setLookAndFeel("javax.swing.plaf.nimbus.NimbusLookAndFeel");
+					UIManager.setLookAndFeel("javax.swing.plaf.nimbus."
+							+ "NimbusLookAndFeel");
 					reportsFrame window = new reportsFrame();
 					// window.display();
 					window.reportFrame.setVisible(true);
@@ -105,7 +105,8 @@ public class reportsFrame {
 		});
 	}
 
-	public reportsFrame() throws SQLException, ClassNotFoundException, InstantiationException, IllegalAccessException,
+	public reportsFrame() throws SQLException, ClassNotFoundException, 
+			InstantiationException, IllegalAccessException,
 			UnsupportedLookAndFeelException {
 		UIManager.setLookAndFeel("javax.swing.plaf.nimbus.NimbusLookAndFeel");
 		initialize();
@@ -121,18 +122,16 @@ public class reportsFrame {
 		reportFrame = new JFrame();
 		conn2 = MySQLConnection.dbConnector();
 
-		reportFrame.addWindowListener(new WindowAdapter()
-        {
-            @Override
-            public void windowClosing(WindowEvent e)
-            {
-                //System.out.println("Closed");
-                MainScreen.frame.setVisible(true);
-                reportFrame.dispose();
+		reportFrame.addWindowListener(new WindowAdapter() {
+			@Override
+			public void windowClosing(WindowEvent e) {
+				// System.out.println("Closed");
+				MainScreen.frame.setVisible(true);
+				reportFrame.dispose();
 
-            }
-        });
-		
+			}
+		});
+
 		reportFrame.setVisible(true);
 		reportFrame.setResizable(false);
 		reportFrame.getContentPane().setBackground(new Color(244, 244, 244));
@@ -142,23 +141,29 @@ public class reportsFrame {
 		reportFrame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 		reportFrame.setLocationRelativeTo(null);
 		reportFrame.getContentPane().setLayout(null);
-		//reportFrame.setExtendedState(JFrame.MAXIMIZED_BOTH);
+		// reportFrame.setExtendedState(JFrame.MAXIMIZED_BOTH);
 		SpringLayout springLayout = new SpringLayout();
 		reportFrame.getContentPane().setLayout(springLayout);
 
-		ImageIcon icon = new ImageIcon(getClass().getResource("/Resources/appIconImage-2.png"));
+		ImageIcon icon = new ImageIcon(getClass().
+				getResource("/Resources/appIconImage-2.png"));
 		reportFrame.setIconImage(icon.getImage());
 
 		JScrollPane scrollPane_1 = new JScrollPane();
-		springLayout.putConstraint(SpringLayout.WEST, scrollPane_1, 720, SpringLayout.WEST,
+		springLayout.putConstraint(SpringLayout.WEST, scrollPane_1, 720, 
+				SpringLayout.WEST,
 				reportFrame.getContentPane());
 		scrollPane_1.setSize(792, 616);
-		scrollPane_1.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS);
-		springLayout.putConstraint(SpringLayout.NORTH, scrollPane_1, 24, SpringLayout.NORTH,
+		scrollPane_1.setVerticalScrollBarPolicy(ScrollPaneConstants.
+				VERTICAL_SCROLLBAR_ALWAYS);
+		springLayout.putConstraint(SpringLayout.NORTH, scrollPane_1, 24, 
+				SpringLayout.NORTH,
 				reportFrame.getContentPane());
-		springLayout.putConstraint(SpringLayout.SOUTH, scrollPane_1, -98, SpringLayout.SOUTH,
+		springLayout.putConstraint(SpringLayout.SOUTH, scrollPane_1, -98, 
+				SpringLayout.SOUTH,
 				reportFrame.getContentPane());
-		springLayout.putConstraint(SpringLayout.EAST, scrollPane_1, -21, SpringLayout.EAST,
+		springLayout.putConstraint(SpringLayout.EAST, scrollPane_1, -21, 
+				SpringLayout.EAST,
 				reportFrame.getContentPane());
 		reportFrame.getContentPane().add(scrollPane_1);
 
@@ -166,7 +171,7 @@ public class reportsFrame {
 		Font font = new Font("Segoe UI Semilight", Font.PLAIN, 20);
 
 		addCategoriesToJCombo();
-		
+
 		// Setting custom font to text fields and comboBoxe
 		resortName.setFont(font);
 		year.setFont(font);
@@ -190,17 +195,21 @@ public class reportsFrame {
 					String Container = (String) type.getSelectedItem();
 
 					// Returns All Package Types By Year For All Associations
-					if (resortName.getText().isEmpty() && !(year.getText().isEmpty())
-							&& type.getSelectedItem().equals("All")) {
+					if (resortName.getText().isEmpty() && 
+							!(year.getText().isEmpty()) &&
+							type.getSelectedItem().equals("All")) 
+					{
 
 						Everything_By_Year(Year);
-						
+
 					}
 
 					// Returns Specific Package Type By Year Without Association
 					// Name
-					else if (resortName.getText().isEmpty() && !(year.getText().isEmpty())
-							&& !(type.getSelectedItem().equals("All"))) {
+					else if (resortName.getText().isEmpty() && 
+							!(year.getText().isEmpty()) &&
+							!(type.getSelectedItem().equals("All"))) 
+					{
 
 						All_Associations_By_Year(Container, Year);
 
@@ -208,8 +217,9 @@ public class reportsFrame {
 
 					// Returns All Package Types For All Years For A Specified
 					// Association
-					else if (!(resortName.getText().isEmpty()) && year.getText().isEmpty()
-							&& type.getSelectedItem().equals("All")) {
+					else if (!(resortName.getText().isEmpty()) && year.getText()
+							.isEmpty() && type.getSelectedItem().equals("All"))
+					{
 
 						Association_Name(Name);
 
@@ -221,7 +231,7 @@ public class reportsFrame {
 							&& !(type.getSelectedItem().equals("All"))) {
 
 						Association_By_Type_And_Name(Name, Container);
-						
+
 					}
 
 					// Returns All Packages Types For Association For A
@@ -239,7 +249,7 @@ public class reportsFrame {
 							&& !(type.getSelectedItem().equals("All"))) {
 
 						Association_By_Type_Name_And_Year(Name, Container, Year);
-						
+
 					}
 
 					// Returns All Package Types For All Associations For All
@@ -248,7 +258,7 @@ public class reportsFrame {
 							&& type.getSelectedItem().equals("All")) {
 
 						UpDateTable();
-						
+
 					}
 
 					// Returns Specified Package Type For All Associations For
@@ -257,7 +267,7 @@ public class reportsFrame {
 							&& !(type.getSelectedItem().equals("All"))) {
 
 						Association_Type(Container);
-						
+
 					}
 
 				} catch (Exception e1) {
@@ -265,31 +275,29 @@ public class reportsFrame {
 				}
 
 			}
-		});        
-        
+		});
+
 		// Reset Button to reset table after a query has been performed
-        JButton btnResetTable = new JButton("Reset Table");
-        btnResetTable.setFont(font);
-        
-        btnResetTable.addMouseListener(new MouseAdapter() {
-            @Override
-            public void mouseClicked(MouseEvent e) {
-                try {
+		JButton btnResetTable = new JButton("Reset Table");
+		btnResetTable.setFont(font);
 
-                    UpDateTable();
+		btnResetTable.addMouseListener(new MouseAdapter() {
+			@Override
+			public void mouseClicked(MouseEvent e) {
+				try {
 
-                } catch (Exception e1) {
-                    e1.printStackTrace();
-                }
+					UpDateTable();
 
-            }
-        });
+				} catch (Exception e1) {
+					e1.printStackTrace();
+				}
 
-		
-		
-		//Left outermost panel
+			}
+		});
+
+		// Left outermost panel
 		JPanel compPanel = new JPanel();
-		
+
 		compPanel.setBorder(new EmptyBorder(25, 0, 0, 25));
 		compPanel.setBackground(new Color(244, 244, 244));
 
@@ -305,47 +313,45 @@ public class reportsFrame {
 		scrollPane.setViewportView(compPanel);
 		compPanel.setLayout(new BoxLayout(compPanel, BoxLayout.X_AXIS));
 
-		//Inner left panel to contain text labels 
+		// Inner left panel to contain text labels
 		JPanel labelPanel = new JPanel((LayoutManager) null);
 		labelPanel.setAlignmentX(Component.LEFT_ALIGNMENT);
 		labelPanel.setAlignmentY(Component.TOP_ALIGNMENT);
 		labelPanel.setBorder(new EmptyBorder(0, 0, 0, 0));
 		labelPanel.setBackground(new Color(244, 244, 244));
-		labelPanel.setPreferredSize(new Dimension (200, 200));
-		labelPanel.setMaximumSize(new Dimension (200,400));
+		labelPanel.setPreferredSize(new Dimension(200, 200));
+		labelPanel.setMaximumSize(new Dimension(200, 400));
 		compPanel.add(labelPanel);
 		GridLayout gl_labelPanel = new GridLayout(0, 1);
 		gl_labelPanel.setVgap(20);
 		labelPanel.setLayout(gl_labelPanel);
 
-		//Inner right panel to contain text fields
+		// Inner right panel to contain text fields
 		JPanel textPanel = new JPanel((LayoutManager) null);
 		textPanel.setAlignmentX(Component.LEFT_ALIGNMENT);
 		textPanel.setAlignmentY(Component.TOP_ALIGNMENT);
 		textPanel.setBorder(new EmptyBorder(0, 0, 0, 0));
 		textPanel.setBackground(new Color(244, 244, 244));
-		textPanel.setPreferredSize(new Dimension (400, 200));
-		textPanel.setMaximumSize(new Dimension (600,400));
+		textPanel.setPreferredSize(new Dimension(400, 200));
+		textPanel.setMaximumSize(new Dimension(600, 400));
 		compPanel.add(textPanel);
 		GridLayout gl_textPanel = new GridLayout(0, 1);
 		gl_textPanel.setVgap(20);
 		textPanel.setLayout(gl_textPanel);
 		reportFrame.getContentPane().add(scrollPane);
 
-		// Array of labels and corresponding textFields to 
-				Object[] fields = {
+		// Array of labels and corresponding textFields to
+		Object[] fields = {
 
-						"Find A File   ", 			empty, // Spacer
+				"Find A File   ", empty, // Spacer
 
-						"Resort Name:    ",			resortName, 
-						"Year:    ", 				year, 
-						"Container Type:    ", 			type,
-						"    ", 						btnRunFileQuery, //Run Button
-						"    ", 						btnResetTable, //Run Button
+				"Resort Name:    ", resortName, "Year:    ", year, "Container Type:    ", type, "    ", btnRunFileQuery, // Run
+																															// Button
+				"    ", btnResetTable, // Run Button
 
-						};
-		
-		//While loop to add labels and text fields from object array above
+		};
+
+		// While loop to add labels and text fields from object array above
 		int i = 0;
 		while (i < fields.length) {
 			JLabel label = new JLabel((String) fields[i++], JLabel.RIGHT);
@@ -355,29 +361,30 @@ public class reportsFrame {
 			textPanel.add((Component) fields[i++]);
 		}
 
-		//Reports JTable
+		// Reports JTable
 		reportsTable = new JTable();
 		{
-			
+
 		}
 
-		//Set JTable editable to false  
-				DefaultTableModel model = new DefaultTableModel();
-				reportsTable = new JTable(model) {
-					public boolean isCellEditable(int rowIndex, int colIndex) {
-						return false; // Disallow the editing of any cell
-					}
-				}; //end set JTable to false
+		// Set JTable editable to false
+		DefaultTableModel model = new DefaultTableModel();
+		reportsTable = new JTable(model) {
+			public boolean isCellEditable(int rowIndex, int colIndex) {
+				return false; // Disallow the editing of any cell
+			}
+		}; // end set JTable to false
 
 		reportsTable.setFont(new Font("Segoe UI Semilight", Font.PLAIN, 22));
-		((DefaultCellEditor) reportsTable.getDefaultEditor(Object.class)).getComponent().setFont(reportsTable.getFont());
+		((DefaultCellEditor) reportsTable.getDefaultEditor(Object.class)).getComponent()
+				.setFont(reportsTable.getFont());
 		reportsTable.getTableHeader().setFont(new Font("Segoe UI Semilight", Font.PLAIN, 22));
 		reportsTable.setRowHeight(reportsTable.getRowHeight() + 20);
 		reportsTable.putClientProperty("terminateEditOnFocusLost", true);
 		scrollPane_1.setViewportView(reportsTable);
 		reportsTable.setAutoCreateRowSorter(true);
 		reportsTable.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
-		
+
 		lblNoOfResults = new JLabel("No. of Results: ");
 		springLayout.putConstraint(SpringLayout.NORTH, lblNoOfResults, 621, SpringLayout.NORTH, scrollPane);
 		lblNoOfResults.setForeground(new Color(0, 155, 167));
@@ -389,10 +396,12 @@ public class reportsFrame {
 		lblNoOfResults.setLocation(400, 0);
 		reportFrame.getContentPane().add(lblNoOfResults);
 
-		//JPanel to hold buttons for horizontal scaling purposes
-		JPanel buttonPanel = new JPanel(); 
-		springLayout.putConstraint(SpringLayout.WEST, buttonPanel, 720, SpringLayout.WEST, reportFrame.getContentPane());
-		springLayout.putConstraint(SpringLayout.EAST, buttonPanel, -20, SpringLayout.EAST, reportFrame.getContentPane());
+		// JPanel to hold buttons for horizontal scaling purposes
+		JPanel buttonPanel = new JPanel();
+		springLayout.putConstraint(SpringLayout.WEST, buttonPanel, 720, SpringLayout.WEST,
+				reportFrame.getContentPane());
+		springLayout.putConstraint(SpringLayout.EAST, buttonPanel, -20, SpringLayout.EAST,
+				reportFrame.getContentPane());
 		buttonPanel.setBackground(new Color(244, 244, 244));
 		buttonPanel.setBorder(new EmptyBorder(10, 20, 10, 20));
 		springLayout.putConstraint(SpringLayout.SOUTH, buttonPanel, -10, SpringLayout.SOUTH,
@@ -532,9 +541,7 @@ public class reportsFrame {
 		springLayout.putConstraint(SpringLayout.SOUTH, btnPrint, -28, SpringLayout.SOUTH, reportFrame.getContentPane());
 		btnPrint.setFont(new Font("Segoe UI Semilight", Font.PLAIN, 22));
 
-		
-
-		//Export to Excel Button
+		// Export to Excel Button
 		JButton btnExportToExcel = new JButton("Export to Excel");
 		btnExportToExcel.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
@@ -569,8 +576,8 @@ public class reportsFrame {
 		btnExportToExcel.setFont(new Font("Segoe UI Semilight", Font.PLAIN, 22));
 		springLayout.putConstraint(SpringLayout.EAST, btnPrint, -80, SpringLayout.WEST, btnExportToExcel);
 
-	} //end initialize
-	
+	} // end initialize
+
 	// Adds categories to category drop down boxes
 	public void addCategoriesToJCombo() {
 
@@ -586,7 +593,6 @@ public class reportsFrame {
 			while (rs.next()) {
 				group = rs.getString("Type");
 				type.addItem(group);
-			
 
 			}
 		} catch (SQLException e) {
@@ -646,10 +652,10 @@ public class reportsFrame {
 		reportsTable.getColumnModel().getColumn(4).setPreferredWidth(100);
 		reportsTable.getColumnModel().getColumn(5).setPreferredWidth(100);
 		reportsTable.getColumnModel().getColumn(6).setPreferredWidth(100);
-		
+
 		countColumns();
 	}
-	
+
 	public static void countColumns() {
 		int rows = reportsTable.getRowCount();
 		lblNoOfResults.setText("No. of Results: " + rows);
@@ -712,8 +718,6 @@ public class reportsFrame {
 			refreshScreen();
 			rsTest.close();
 			stmt.close();
-		
-			
 
 		} catch (Exception e) {
 			JOptionPane.showMessageDialog(null, e);
@@ -852,9 +856,6 @@ public class reportsFrame {
 			JOptionPane.showMessageDialog(null, e);
 		}
 	}
-	
-	
-	
 
 	// NEEDED BIG TIME
 	public static void Association_By_Type_Name_And_Year(String name, String type, int year) {
@@ -881,48 +882,48 @@ public class reportsFrame {
 			JOptionPane.showMessageDialog(null, e);
 		}
 	}
-	public void getYearInput()
-	{
+
+	public void getYearInput() {
 		year.addKeyListener(new KeyAdapter() {
 			public void keyReleased(KeyEvent e) {
 
 				getIntegerInput(year, e);
 
-
 			}
 		});
 	}
-	
-	public void getIntegerInput(JTextField jText, KeyEvent e){
-	    
+
+	public void getIntegerInput(JTextField jText, KeyEvent e) {
+
 		numswap = null;
 		String temp = jText.getText();
-        //only accepts positives doubles
-        
-    
-        String regex = "(?<![-.])\\b[0-9]+\\b(?!\\.[0-9])";
-    
-        //    (?<![-.])   # Assert that the previous character isn't a minus sign or a dot.
-        //    \b          # Anchor the match to the start of a number.
-        //    [0-9]+      # Match a number.
-        //    \b          # Anchor the match to the end of the number.
-        //    (?!\.[0-9]) # Assert that no decimal part follows.
-    
-        if(temp.matches(regex))
-        {
-            numswap = temp;
+		// only accepts positives doubles
 
-        }
-        else if((e.getKeyCode() == KeyEvent.VK_BACK_SPACE) || (e.getKeyCode() == KeyEvent.VK_DELETE) 
-                && temp.length() == 0)
-        {//deletes the element in textbox
-            jText.setText("");
-            numswap="";
-        }
-        
-        else{
-            jText.setText(numswap);
-        }
-    }
+		String regex = "(?<![-.])\\b[0-9]+\\b(?!\\.[0-9])";
+
+		// (?<![-.]) # Assert that the previous character isn't a minus sign or
+		// a dot.
+		// \b # Anchor the match to the start of a number.
+		// [0-9]+ # Match a number.
+		// \b # Anchor the match to the end of the number.
+		// (?!\.[0-9]) # Assert that no decimal part follows.
+
+		if (temp.matches(regex)) {
+			numswap = temp;
+
+		} else if ((e.getKeyCode() == KeyEvent.VK_BACK_SPACE)
+				|| (e.getKeyCode() == KeyEvent.VK_DELETE) && temp.length() == 0) {// deletes
+																					// the
+																					// element
+																					// in
+																					// textbox
+			jText.setText("");
+			numswap = "";
+		}
+
+		else {
+			jText.setText(numswap);
+		}
+	}
 
 } // end of ReportsFrame
