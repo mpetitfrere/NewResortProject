@@ -24,15 +24,12 @@ import java.awt.event.WindowListener;
 import java.awt.Toolkit;
 
 import java.net.URISyntaxException;
-import java.sql.Connection;
-import java.util.Map;
-import java.util.TreeMap;
+
 
 public class MainScreen extends JApplet {
 
 	public static JFrame frame;
 
-	Connection connection = null;
 
 	public static void main(String[] args) {
 		SwingUtilities.invokeLater(() -> {
@@ -47,7 +44,6 @@ public class MainScreen extends JApplet {
 
 	public MainScreen() throws URISyntaxException {
 		super();
-		connection = MySQLConnection.dbConnector();
 		UIManager.put("ToolTip.foreground", new ColorUIResource(Color.WHITE));
 		UIManager.put("ToolTip.background", new ColorUIResource(new Color(0, 155, 167)));
 		UIManager.put("ToolTip.font", new FontUIResource("Segoe UI Semilight", Font.BOLD, 20));
