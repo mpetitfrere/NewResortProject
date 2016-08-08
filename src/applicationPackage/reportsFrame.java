@@ -105,10 +105,19 @@ public class reportsFrame {
 		});
 	}
 
-	public reportsFrame() throws SQLException, ClassNotFoundException, InstantiationException, IllegalAccessException,
+	public reportsFrame() throws ClassNotFoundException, InstantiationException, IllegalAccessException,
 			UnsupportedLookAndFeelException {
 		UIManager.setLookAndFeel("javax.swing.plaf.nimbus.NimbusLookAndFeel");
-		initialize();
+		try {
+			initialize();
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			 if(e.getMessage().contains("Communications link failure"))
+             {
+                 JOptionPane.showMessageDialog(null, "Internet connection was lost. Please try again.");
+             }
+                 
+		}
 		UpDateTable();
 
 	}
@@ -116,7 +125,7 @@ public class reportsFrame {
 	/**
 	 * Initialize the contents of the frame.
 	 */
-	private void initialize() {
+	private void initialize() throws SQLException {
 
 		reportFrame = new JFrame();
 		conn2 = MySQLConnection.dbConnector();

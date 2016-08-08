@@ -59,7 +59,9 @@ public class ExcelFrame extends JFrame {
      */
     public ExcelFrame() {
     	
-
+    	UIManager.put("ToolTip.foreground", new ColorUIResource(Color.WHITE));
+		UIManager.put("ToolTip.background", new ColorUIResource(new Color(0, 155, 167)));
+		UIManager.put("ToolTip.font", new FontUIResource("Segoe UI Semilight", Font.BOLD, 20));
 
     	addWindowListener(new WindowAdapter()
         {
@@ -86,9 +88,7 @@ public class ExcelFrame extends JFrame {
         setLocationRelativeTo(null);
         //ImageIcon icon = new ImageIcon(getClass().getResource("/Resources/appIconImage.png"));
 
-		UIManager.put("ToolTip.foreground", new ColorUIResource(Color.WHITE));
-		UIManager.put("ToolTip.background", new ColorUIResource(new Color(0, 155, 167)));
-		UIManager.put("ToolTip.font", new FontUIResource("Segoe UI Semilight", Font.BOLD, 20));
+		
 
 
         final JFileChooser fc = new JFileChooser();
@@ -145,6 +145,10 @@ public class ExcelFrame extends JFrame {
                                 JOptionPane.showMessageDialog(contentPane, duplicateItem + "\nWhere Aisle-Row-Column-Depth", 
                                         "Duplicated Location", JOptionPane.ERROR_MESSAGE);    
                             }
+                            else if(e1.getMessage().contains("Communications link failure"))
+                            {
+                                JOptionPane.showMessageDialog(null, "Internet connection was lost. Please try again.");
+                            }
                             else{
                                 JOptionPane.showMessageDialog(contentPane, "Import failed. Please fix your file and reimport.", 
                                         "ERROR", JOptionPane.ERROR_MESSAGE);
@@ -178,12 +182,17 @@ public class ExcelFrame extends JFrame {
             @Override
             public void mouseClicked(MouseEvent e) {
                 try {
+                	
                     ConvertExcel.exportExcel(false);
 
 
 
 
-                } catch (IOException e1) {e1.printStackTrace();
+                } catch (IOException | SQLException e1) {
+                	 if(e1.getMessage().contains("Communications link failure"))
+                     {
+                         JOptionPane.showMessageDialog(null, "Internet connection was lost. Please try again.");
+                     }
                 
 
                 
@@ -209,9 +218,12 @@ public class ExcelFrame extends JFrame {
             public void mouseClicked(MouseEvent e) {
                 try {
                     ConvertExcel.exportExcel(true);
-                } catch (IOException e1) {
+                } catch (IOException | SQLException e1) {
                     // TODO Auto-generated catch block
-                    e1.printStackTrace();
+                	 if(e1.getMessage().contains("Communications link failure"))
+                     {
+                         JOptionPane.showMessageDialog(null, "Internet connection was lost. Please try again.");
+                     }
                 }
             }
         });

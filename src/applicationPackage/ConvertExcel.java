@@ -28,7 +28,7 @@ import java.util.Iterator;
  */
 public class ConvertExcel {
 
-    public static void exportExcel(boolean templateState)throws IOException
+    public static void exportExcel(boolean templateState)throws IOException, SQLException
     {
         JTable table = new JTable();
         DateTime dt = new DateTime();
@@ -111,10 +111,6 @@ public class ConvertExcel {
             colName[headings] = table.getColumnName(headings);
         }
       
-       
-        
-
-
         for(int rows = 0; rows < model.getRowCount(); rows++){ //For each table row
         	//Set the row to the next one in the sequence
         	headerRow = sheet.createRow((rows + 1));
@@ -136,13 +132,10 @@ public class ConvertExcel {
                         DataFormatter dfTemp = new DataFormatter();
                         cell.setCellValue(x);
                         cell.setCellValue( dfTemp.formatCellValue(cell));
-                        System.out.println(x);
-
                     }
                 }
             }
-            //Set the row to the next one in the sequence
-            
+            //Set the row to the next one in the sequence          
 
 
         }//end of row loop
@@ -518,7 +511,6 @@ public class ConvertExcel {
                     if(j==size-1)//num of columns in database
                     {
                         prepare.executeUpdate();
-                        prepare.getConnection().commit();
                     }
                 }
                 else
@@ -533,6 +525,9 @@ public class ConvertExcel {
             }// end of j loop
             
         }//end of i loop
+        
+        prepare.getConnection().commit();
+        prepare.close();
         try {
             file.close();
         } catch (IOException e1) {
