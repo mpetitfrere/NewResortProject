@@ -31,5 +31,7 @@
 	<classpathentry kind="con" path="org.eclipse.jdt.USER_LIBRARY/JavaFX"/>
 	<classpathentry kind="lib" path="src/Jars/mysql-connector-java-5.0.8-bin.jar"/>
 	<classpathentry kind="lib" path="src/Jars/miglayout-4.0-swing.jar"/>
+	<classpathentry kind="lib" path="src/Jars/glazedlists_java15-1.9.0.jar"/>
+	<classpathentry kind="lib" path="src/Jars/AutoCompleter.jar"/>
 	<classpathentry kind="output" path="target/classes"/>
 </classpath>
