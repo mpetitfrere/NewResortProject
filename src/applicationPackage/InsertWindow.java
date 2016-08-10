@@ -337,25 +337,13 @@ public class InsertWindow {
 					} catch (NumberFormatException | SQLException e1) {
 						// TODO Auto-generated catch block
 						e1.printStackTrace();
-					}
-
-				
-			}
+					}}
 
 			@Override
 			public void removeUpdate(DocumentEvent e) {
 				// TODO Auto-generated method stub
 				
-			}
-
-        	
-        	// TODO Auto-generated method stub
-
-        }
-
-
-
-        		);
+			}});
         
         field1.addMouseListener(new MouseListener(){
 
@@ -599,7 +587,7 @@ public class InsertWindow {
                 }
             };
             //query and resultset
-            String testTable_String = "Select AssociationName, Year, Type, Aisle, `Row`, `Column`, Depth from ResortManagement";
+            String testTable_String = "Select * from ResortManagement";
             PreparedStatement showTestTable = conn.prepareStatement(testTable_String);
             ResultSet rsTest = showTestTable.executeQuery();
             addRowsAndColumns(rsTest, dm);
@@ -671,6 +659,8 @@ public class InsertWindow {
         testTable.getColumnModel().getColumn(4).setPreferredWidth(100);
         testTable.getColumnModel().getColumn(5).setPreferredWidth(100);
         testTable.getColumnModel().getColumn(6).setPreferredWidth(100);
+        testTable.getColumnModel().getColumn(7).setPreferredWidth(100);
+
     }
     
     private void addTextBoxFields()
@@ -1030,6 +1020,7 @@ public class InsertWindow {
         prepare.setInt(6, Integer.parseInt(field6.getText()));
         prepare.setString(7, field7.getSelectedItem().toString());
     }
+   
     public void setPrepareField7() throws NumberFormatException, SQLException
     {
         prepare.setString(Integer.parseInt(field7.getName()), field7.getSelectedItem().toString());
