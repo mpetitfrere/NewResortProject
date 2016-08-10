@@ -10,6 +10,7 @@ import java.awt.Toolkit;
 import java.awt.Window;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.sql.Connection;
@@ -17,6 +18,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
+import java.sql.Statement;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -40,12 +42,16 @@ import javax.swing.SpringLayout;
 import javax.swing.UIManager;
 import javax.swing.UnsupportedLookAndFeelException;
 import javax.swing.border.EmptyBorder;
+import javax.swing.event.DocumentEvent;
+import javax.swing.event.DocumentListener;
 import javax.swing.plaf.FontUIResource;
 import javax.swing.table.AbstractTableModel;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableModel;
 import javax.swing.text.DefaultFormatterFactory;
 import javax.swing.text.MaskFormatter;
+
+import com.mxrck.autocompleter.TextAutoCompleter;
 
 import applicationPackage.ExcelFrame;
 
@@ -74,6 +80,7 @@ public class InsertWindow {
     private String numSwap;
     private String autoIDString;
     private String deleteItemString;
+    private TextAutoCompleter complete;
  
 
     // instantiating textfields for each jlabel
@@ -129,7 +136,10 @@ public class InsertWindow {
      * @wbp.parser.entryPoint
      */
     private void initialize() throws SQLException {
+    	//init objects
     	conn= MySQLConnection.dbConnector();
+	    complete=new TextAutoCompleter(field1);
+
         //Components
         JScrollPane scrollPane_1 = new JScrollPane();
         updateBtn = new JButton("Update");
@@ -149,6 +159,8 @@ public class InsertWindow {
         getTypes();
         getInputFromFields();
         actionPerformedBtn();
+        autoComplete();
+
         
 
         frmInsertAsset.addWindowListener(new WindowAdapter()
@@ -193,51 +205,44 @@ public class InsertWindow {
                 
             }
             private void insertToDB() {
-                if(!isFieldsEmpty() && validateFields())
-                {
-                    try {
-                        prepare.executeUpdate();
-                        prepare.getConnection().commit();
-                        prepare.close();
-                        initPrepareStatment();
-                        clearFields();
-                        UpDateTable();
-                        addTypes();
-                        setPrepareField7();
-                        JOptionPane.showMessageDialog(null, "Successfully inserted into database.", "Success" , JOptionPane.INFORMATION_MESSAGE);
+            	if(!isFieldsEmpty() && validateFields())
+            	{
+            		try {
+            			insertMethodCalls();
+            			JOptionPane.showMessageDialog(null, "Successfully inserted into database.", "Success" , JOptionPane.INFORMATION_MESSAGE);
 
-                    } catch (SQLException e) {
-                        // Check Duplicate Entry on index LOCATION
-                        if(e.getMessage().contains("key 'LOCATION'"))
-                        {
-                            JOptionPane.showMessageDialog(null, "There is already an item  at \nAisle :" + field4.getText() + "\nRow: " + field5.getText()
-                            + "\nColumn: " + field6.getText() + "\nDepth: " + field7.getSelectedItem().toString() 
-                            + "\nPlease change the location and insert again or if you wish to use this location \nplease delete or change the location of existing item \nin this location first, then try again."
-                            , "Error", JOptionPane.ERROR_MESSAGE);
-                            try {
-                                prepare.close();
-                                initPrepareStatment();
-                                getPrepareValues();
-                            } catch (SQLException e1) {
-                                // TODO Auto-generated catch block
-                                //e1.printStackTrace();
-                            }    
-                        }
-                        else if(e.getMessage().contains("Communications link failure"))
-                        {
-                            JOptionPane.showMessageDialog(null, "Internet connection was lost. Please try again.");
-                            try {
-                                prepare.close();
-                                initPrepareStatment();
-                                getPrepareValues();
-                            } catch (SQLException e1) {
-                                // TODO Auto-generated catch block
-                                e1.printStackTrace();
-                            }
+            		} catch (SQLException e) {
+            			// Check Duplicate Entry on index LOCATION
+            			if(e.getMessage().contains("key 'LOCATION'"))
+            			{
+            				JOptionPane.showMessageDialog(null, "There is already an item  at \nAisle :" + field4.getText() + "\nRow: " + field5.getText()
+            				+ "\nColumn: " + field6.getText() + "\nDepth: " + field7.getSelectedItem().toString() 
+            				+ "\nPlease change the location and insert again or if you wish to use this location \nplease delete or change the location of existing item \nin this location first, then try again."
+            				, "Error", JOptionPane.ERROR_MESSAGE);
+            				try {
+            					prepare.close();
+            					initPrepareStatment();
+            					getPrepareValues();
+            				} catch (SQLException e1) {
+            					// TODO Auto-generated catch block
+            					//e1.printStackTrace();
+            				}    
+            			}
+            			else if(e.getMessage().contains("Communications link failure"))
+            			{
+            				JOptionPane.showMessageDialog(null, "Internet connection was lost. Please try again.");
+            				try {
+            					prepare.close();
+            					initPrepareStatment();
+            					getPrepareValues();
+            				} catch (SQLException e1) {
+            					// TODO Auto-generated catch block
+            					e1.printStackTrace();
+            				}
 
-                        }
-                    }    
-                }
+            			}
+            		}    
+            	}
             }
         });
         deleteBtn.addActionListener(new ActionListener() {
@@ -256,6 +261,7 @@ public class InsertWindow {
                 prepareDel.executeUpdate();
                 prepareDel.getConnection().commit();
                 UpDateTable();
+                autoComplete();
                 JOptionPane.showMessageDialog(null, "Successfully deleted item: " + field1.getText());
                 prepareDel.close();
                 //conn.close();
@@ -293,6 +299,7 @@ public class InsertWindow {
         UpDateTable();
         clearFields();
         prepareUpdate.close();
+        autoComplete();
         //conn.close();
         JOptionPane.showMessageDialog(null, "Successfully updated item.", "Update" , JOptionPane.INFORMATION_MESSAGE);
 
@@ -305,12 +312,73 @@ public class InsertWindow {
             public void keyReleased(KeyEvent e) {
                 try {
                     prepare.setString(Integer.parseInt(field1.getName()), field1.getText());
+                    System.out.println("DoctorV: " + field1.getText());
+
                 } catch (NumberFormatException | SQLException e1) {
                     // TODO Auto-generated catch block
                     e1.printStackTrace();
                 }
             }
         });
+        
+        //gets value from autocomplete selection
+        field1.getDocument().addDocumentListener(new DocumentListener(){
+        	@Override
+        	public void changedUpdate(DocumentEvent e) {
+               
+        	}
+
+			@Override
+			public void insertUpdate(DocumentEvent e) {
+				 try {
+						prepare.setString(Integer.parseInt(field1.getName()), field1.getText());
+	                    System.out.println("DoctorO: " + field1.getText());
+
+					} catch (NumberFormatException | SQLException e1) {
+						// TODO Auto-generated catch block
+						e1.printStackTrace();
+					}}
+
+			@Override
+			public void removeUpdate(DocumentEvent e) {
+				// TODO Auto-generated method stub
+				
+			}});
+        
+        field1.addMouseListener(new MouseListener(){
+
+            @Override
+            public void mouseClicked(MouseEvent e) {
+            	JTextField jf = (JTextField) e.getSource();
+                System.out.println("Doctor: " + jf.getText());
+            }
+
+		
+
+			@Override
+			public void mouseEntered(MouseEvent arg0) {
+				// TODO Auto-generated method stub
+				
+			}
+
+			@Override
+			public void mouseExited(MouseEvent arg0) {
+				// TODO Auto-generated method stub
+				
+			}
+
+			@Override
+			public void mousePressed(MouseEvent arg0) {
+				// TODO Auto-generated method stub
+				
+			}
+
+			@Override
+			public void mouseReleased(MouseEvent arg0) {
+				// TODO Auto-generated method stub
+				
+			}});
+    
         
         field2.addKeyListener(new KeyAdapter() {
             public void keyReleased(KeyEvent e) {
@@ -387,7 +455,6 @@ public class InsertWindow {
         String temp = jText.getText();
         //only accepts positives doubles
         
-    
         String regex = "(?<![-.])\\b[0-9]+\\b(?!\\.[0-9])";
     
         //    (?<![-.])   # Assert that the previous character isn't a minus sign or a dot.
@@ -418,8 +485,6 @@ public class InsertWindow {
         }
     }
 
-    
-    
     private void getTypes() throws SQLException {
         //field3
         prepare.setString(3, field3.getSelectedItem().toString());
@@ -522,7 +587,7 @@ public class InsertWindow {
                 }
             };
             //query and resultset
-            String testTable_String = "Select AssociationName, Year, Type, Aisle, `Row`, `Column`, Depth from ResortManagement";
+            String testTable_String = "Select * from ResortManagement";
             PreparedStatement showTestTable = conn.prepareStatement(testTable_String);
             ResultSet rsTest = showTestTable.executeQuery();
             addRowsAndColumns(rsTest, dm);
@@ -594,6 +659,8 @@ public class InsertWindow {
         testTable.getColumnModel().getColumn(4).setPreferredWidth(100);
         testTable.getColumnModel().getColumn(5).setPreferredWidth(100);
         testTable.getColumnModel().getColumn(6).setPreferredWidth(100);
+        testTable.getColumnModel().getColumn(7).setPreferredWidth(100);
+
     }
     
     private void addTextBoxFields()
@@ -614,6 +681,7 @@ public class InsertWindow {
             g1_Jpanel.add(label);
             g1_Jpanel.add((Component) fields[i++]);
         }
+	    
         field7.addItem("B");
         field7.addItem("F");
         setTextFieldName();
@@ -823,8 +891,6 @@ public class InsertWindow {
         scrollPane.setLocation(15, 80);
         //scrollPane.setSize(561, 610);
         scrollPane.getVerticalScrollBar().setUnitIncrement(16);
-    
-    
         scrollPane.setViewportView(g1_Jpanel);
         frmInsertAsset.getContentPane().add(scrollPane);    
     }
@@ -838,7 +904,6 @@ public class InsertWindow {
         //remove items in combobox
         field3.removeAllItems();
 
-        
         stmt = conn.createStatement(); // \"group\",price //\"group\",price
         ResultSet rs = stmt.executeQuery("SELECT Distinct Type From ResortManagement");
         String group = "";
@@ -955,8 +1020,36 @@ public class InsertWindow {
         prepare.setInt(6, Integer.parseInt(field6.getText()));
         prepare.setString(7, field7.getSelectedItem().toString());
     }
+   
     public void setPrepareField7() throws NumberFormatException, SQLException
     {
         prepare.setString(Integer.parseInt(field7.getName()), field7.getSelectedItem().toString());
     }
+    
+    private void insertMethodCalls() throws SQLException
+    {
+    	  prepare.executeUpdate();
+          prepare.getConnection().commit();
+          prepare.close();
+          initPrepareStatment();
+          clearFields();
+          UpDateTable();
+          addTypes();
+          setPrepareField7();
+          autoComplete();
+    }
+    
+    private void autoComplete() throws SQLException
+    {
+    	Statement stmt = conn.createStatement();
+		ResultSet rs = stmt.executeQuery("SELECT Distinct AssociationName From ResortManagement");
+		complete.removeAllItems();
+		while (rs.next()) {
+			
+	        complete.addItem(rs.getString("AssociationName"));
+		}
+		rs.close();
+		stmt.close();
+    }
+    
 }
