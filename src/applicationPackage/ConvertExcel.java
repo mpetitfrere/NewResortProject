@@ -344,7 +344,7 @@ public class ConvertExcel {
             Connection conn = MySQLConnection.dbConnector();
             DefaultTableModel dm = new DefaultTableModel();
             //query and resultset
-            String testTable_String = "Select AssociationName, Year, Type, Aisle, `Row`, `Column`, Depth from ResortManagement";
+            String testTable_String = "Select * from ResortManagement";
             PreparedStatement showTestTable = conn.prepareStatement(testTable_String);
             ResultSet rsTest = showTestTable.executeQuery();
             addRowsAndColumns(rsTest, dm);
