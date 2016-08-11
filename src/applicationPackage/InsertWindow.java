@@ -137,6 +137,8 @@ public class InsertWindow {
      * @wbp.parser.entryPoint
      */
     private void initialize() throws SQLException {
+    	
+    	field1.setFont(new Font("Arial", Font.BOLD, 14));
     	//init objects
     	conn= MySQLConnection.dbConnector();
 	    complete=new TextAutoCompleter(field1);
@@ -954,7 +956,8 @@ public class InsertWindow {
         field4.setFont(font);
         field5.setFont(font);
         field6.setFont(font);
-        field7.setFont(font);    
+        field7.setFont(font); 
+        
     }
     private boolean isFieldsEmpty()
     {
@@ -1047,8 +1050,7 @@ public class InsertWindow {
     	Statement stmt = conn.createStatement();
 		ResultSet rs = stmt.executeQuery("SELECT Distinct AssociationName From ResortManagement");
 		complete.removeAllItems();
-		while (rs.next()) {
-			
+		while (rs.next()) {			
 	        complete.addItem(rs.getString("AssociationName"));
 		}
 		rs.close();
