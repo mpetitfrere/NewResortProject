@@ -163,8 +163,6 @@ public class InsertWindow {
         actionPerformedBtn();
         autoComplete();
 
-        
-
         frmInsertAsset.addWindowListener(new WindowAdapter()
             {
                 @Override
@@ -258,24 +256,39 @@ public class InsertWindow {
             }
 
             private void deleteItem() throws SQLException {
-            
-                PreparedStatement prepareDel = conn.prepareStatement(deleteItemString);
-                prepareDel.executeUpdate();
-                prepareDel.getConnection().commit();
+           
+                String defaultField1 = "EMPTY";
+                String defaultField2 = "0000";
+                String defaultField3 = "EMPTY";
+                String updateFieldsSQL;
+                PreparedStatement prepareUpdate = null;
+
+                if(selection != null)
+                {
+                	for(int i=0; i<selection.length; i++){
+                		updateFieldsSQL = "UPDATE `new_schema`.`ResortManagement` SET `AssociationName`='" + defaultField1 +"', "
+                				+ "`Year`='" + defaultField2 + "', "
+                				+ "`Type`='" + defaultField3 + "', "
+                				+ "`Aisle`='" + String.valueOf(testTable.getModel().getValueAt(selection[i], 3))+ "', "
+                				+ "`Row`='" + String.valueOf(testTable.getModel().getValueAt(selection[i], 4)) + "', "
+                				+ "`Column`='" + String.valueOf(testTable.getModel().getValueAt(selection[i], 5)) + "', "
+                				+ "`Depth`='" + String.valueOf(testTable.getModel().getValueAt(selection[i], 6)) + "' "
+                				+ " WHERE `ID`='" + String.valueOf(testTable.getModel().getValueAt(selection[i], 7))+ "'";
+                		System.out.println(updateFieldsSQL);
+                		prepareUpdate = conn.prepareStatement(updateFieldsSQL);
+                		prepareUpdate.executeUpdate();
+                		prepareUpdate.getConnection().commit();
+                        UpDateTable();
+                		addTypes();
+                }
+
+
+                }
                 
-                
-//                String updateFieldsSQL = "UPDATE `new_schema`.`ResortManagement` SET `AssociationName`='" + field1.getText() +"', "
-//                        + "`Year`='" + field2.getText() + "', `Type`='" + field3.getSelectedItem().toString() + "', "
-//                        + "`Aisle`='" + field4.getText() + "', `Row`='" + field5.getText() + "', `Column`='" + field6.getText() 
-//                        + "', `Depth`='" + field7.getSelectedItem().toString() + "' "
-//                        + "WHERE `ID`='" + String.valueOf(ID)+ "'";
-//                PreparedStatement prepareUpdate = conn.prepareStatement(updateFieldsSQL);
-//                prepareUpdate.executeUpdate();
-//                prepareUpdate.getConnection().commit();
+                prepareUpdate.close();
                 UpDateTable();
                 autoComplete();
                 JOptionPane.showMessageDialog(null, "Successfully deleted item: " + field1.getText());
-                prepareDel.close();
                 //conn.close();
             }
         });
@@ -727,13 +740,9 @@ public class InsertWindow {
             //    // the textboxes
             @Override
             public void mouseReleased(java.awt.event.MouseEvent evt) {
-                //System.out.println(testTable.getSelectedRows()[1]);
+            	//Grabs the indices form table
                 selection = testTable.getSelectedRows();
-                
-          
-                getIDFromTable(selection);
-             
-             
+                             
                 int row = testTable.getSelectedRow();    
                 //Gets text from row and fills jtext if cell is not empty
 
@@ -801,16 +810,7 @@ public class InsertWindow {
         
     }//End of setupTable
     
-    //Grabs ID fromt table
-    public void getIDFromTable(int[] selection)
-    {
-    	 for(int i=0; i<selection.length; i++){
-          	//System.out.println(selection[i]);
-          	System.out.print("Row " + selection[i] + " ");
-          	System.out.println("Table: " + testTable.getModel().getValueAt(selection[i], 7));
-          	
-          }
-    }
+  
     
     
     private void setupFrame()
