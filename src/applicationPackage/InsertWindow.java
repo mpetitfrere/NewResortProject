@@ -667,6 +667,13 @@ public class InsertWindow {
         field5.setEnabled(false);
         field6.setEnabled(false);
         field7.setEnabled(false);
+        
+        field4.setDisabledTextColor(Color.BLACK);
+        field5.setDisabledTextColor(Color.BLACK);
+        field6.setDisabledTextColor(Color.BLACK);
+       
+
+
 
         field7.addItem("B");
         field7.addItem("F");
