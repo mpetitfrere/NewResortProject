@@ -81,7 +81,7 @@ public class InsertWindow {
     private String autoIDString;
     private String deleteItemString;
     private TextAutoCompleter complete;
- 
+    int[] selection;
 
     // instantiating textfields for each jlabel
     private JTextField field1 = new JTextField();
@@ -91,6 +91,8 @@ public class InsertWindow {
     private JTextField field5 = new JTextField();
     private JTextField field6 = new JTextField();    
     private JComboBox field7 = new JComboBox();
+    private JTextField endYearField = new JTextField();    
+
     private JButton updateBtn;
     private JButton clearBtn;
     private JButton excelBtn;
@@ -260,6 +262,16 @@ public class InsertWindow {
                 PreparedStatement prepareDel = conn.prepareStatement(deleteItemString);
                 prepareDel.executeUpdate();
                 prepareDel.getConnection().commit();
+                
+                
+//                String updateFieldsSQL = "UPDATE `new_schema`.`ResortManagement` SET `AssociationName`='" + field1.getText() +"', "
+//                        + "`Year`='" + field2.getText() + "', `Type`='" + field3.getSelectedItem().toString() + "', "
+//                        + "`Aisle`='" + field4.getText() + "', `Row`='" + field5.getText() + "', `Column`='" + field6.getText() 
+//                        + "', `Depth`='" + field7.getSelectedItem().toString() + "' "
+//                        + "WHERE `ID`='" + String.valueOf(ID)+ "'";
+//                PreparedStatement prepareUpdate = conn.prepareStatement(updateFieldsSQL);
+//                prepareUpdate.executeUpdate();
+//                prepareUpdate.getConnection().commit();
                 UpDateTable();
                 autoComplete();
                 JOptionPane.showMessageDialog(null, "Successfully deleted item: " + field1.getText());
@@ -345,40 +357,6 @@ public class InsertWindow {
 				
 			}});
         
-        field1.addMouseListener(new MouseListener(){
-
-            @Override
-            public void mouseClicked(MouseEvent e) {
-            	JTextField jf = (JTextField) e.getSource();
-                System.out.println("Doctor: " + jf.getText());
-            }
-
-		
-
-			@Override
-			public void mouseEntered(MouseEvent arg0) {
-				// TODO Auto-generated method stub
-				
-			}
-
-			@Override
-			public void mouseExited(MouseEvent arg0) {
-				// TODO Auto-generated method stub
-				
-			}
-
-			@Override
-			public void mousePressed(MouseEvent arg0) {
-				// TODO Auto-generated method stub
-				
-			}
-
-			@Override
-			public void mouseReleased(MouseEvent arg0) {
-				// TODO Auto-generated method stub
-				
-			}});
-    
         
         field2.addKeyListener(new KeyAdapter() {
             public void keyReleased(KeyEvent e) {
@@ -485,7 +463,8 @@ public class InsertWindow {
         }
     }
 
-    private void getTypes() throws SQLException {
+    private void getTypes() throws SQLException 
+    {
         //field3
         prepare.setString(3, field3.getSelectedItem().toString());
 
@@ -668,11 +647,13 @@ public class InsertWindow {
         Object[] fields = {
                 "Association Name:    ", field1,
                 "Year:    ", field2,
+                "Year:      ", endYearField,
                 "Type:    ", field3,
                 "Aisle:    ", field4,
                 "Row:    ", field5,
                 "Column:    ", field6,
                 "Depth:    ", field7
+                
         };
         int i=0;
         while (i < fields.length) {
@@ -682,6 +663,11 @@ public class InsertWindow {
             g1_Jpanel.add((Component) fields[i++]);
         }
 	    
+        field4.setEnabled(false);
+        field5.setEnabled(false);
+        field6.setEnabled(false);
+        field7.setEnabled(false);
+
         field7.addItem("B");
         field7.addItem("F");
         setTextFieldName();
@@ -734,9 +720,16 @@ public class InsertWindow {
             //    // the textboxes
             @Override
             public void mouseReleased(java.awt.event.MouseEvent evt) {
+                //System.out.println(testTable.getSelectedRows()[1]);
+                selection = testTable.getSelectedRows();
+                
+          
+                getIDFromTable(selection);
+             
+             
                 int row = testTable.getSelectedRow();    
                 //Gets text from row and fills jtext if cell is not empty
-                
+
                 if(testTable.getValueAt(row, 0) != null)
                 {
                     field1.setText(testTable.getValueAt(row, 0).toString());
@@ -787,6 +780,8 @@ public class InsertWindow {
                         + " AND `Row` = '" + field5.getText() + "' " + "AND `Column` ='" + field6.getText() +"' "
                         + "AND `Depth` ='"+ field7.getSelectedItem().toString() + "'";
                 
+                
+                
                 try {
                     getPrepareValues();
                 } catch (SQLException e) {
@@ -798,7 +793,19 @@ public class InsertWindow {
         });
         
     }//End of setupTable
-
+    
+    //Grabs ID fromt table
+    public void getIDFromTable(int[] selection)
+    {
+    	 for(int i=0; i<selection.length; i++){
+          	//System.out.println(selection[i]);
+          	System.out.print("Row " + selection[i] + " ");
+          	System.out.println("Table: " + testTable.getModel().getValueAt(selection[i], 7));
+          	
+          }
+    }
+    
+    
     private void setupFrame()
     {
         frmInsertAsset.setVisible(true);
