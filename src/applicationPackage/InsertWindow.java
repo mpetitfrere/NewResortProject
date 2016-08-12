@@ -152,10 +152,12 @@ public class InsertWindow {
         clearBtn = new JButton("Clear Fields");
         excelBtn = new JButton("Excel");
         deleteBtn = new JButton("Delete");
+        springLayout.putConstraint(SpringLayout.WEST, deleteBtn, 70, SpringLayout.EAST, updateBtn);
+        springLayout.putConstraint(SpringLayout.EAST, deleteBtn, -78, SpringLayout.WEST, scrollPane_1);
 
         //Setting up Gui's frame and components
         setupFrame();
-        setUpFrameComponents(scrollPane_1, insertBtn, updateBtn, clearBtn);
+        setUpFrameComponents(scrollPane_1,  updateBtn, clearBtn);
         gridLayoutSetup();
         setupTable(scrollPane_1);
         initPrepareStatment();
@@ -838,7 +840,7 @@ public class InsertWindow {
         frmInsertAsset.setIconImage(icon.getImage());
     }
 
-    private void setUpFrameComponents(JScrollPane scrollPane_1, JButton btnInsert, JButton btnUpdate, JButton btnClear) {
+    private void setUpFrameComponents(JScrollPane scrollPane_1, JButton btnUpdate, JButton btnClear) {
         scrollPane_1.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS);
         springLayout.putConstraint(SpringLayout.NORTH, scrollPane_1, 24, SpringLayout.NORTH, frmInsertAsset.getContentPane());
         springLayout.putConstraint(SpringLayout.SOUTH, scrollPane_1, -37, SpringLayout.SOUTH, frmInsertAsset.getContentPane());
@@ -855,17 +857,17 @@ public class InsertWindow {
         updateBtn.setSize(180, 38);
         clearBtn.setSize(448, 38);
         //Button Insert
-        btnInsert.setLocation(15, 662);
-        btnInsert.setFont(new Font("Segoe UI Semilight", Font.PLAIN, 22));
-        frmInsertAsset.getContentPane().add(btnInsert);
+        //btnInsert.setLocation(15, 662);
+        //btnInsert.setFont(new Font("Segoe UI Semilight", Font.PLAIN, 22));
+        //frmInsertAsset.getContentPane().add(btnInsert);
         btnUpdate.setLocation(275, 662);
         btnUpdate.setFont(new Font("Segoe UI Semilight", Font.PLAIN, 22));
         frmInsertAsset.getContentPane().add(btnUpdate);
         btnClear.setLocation(913, 653);
         btnClear.setFont(new Font("Segoe UI Semilight", Font.PLAIN, 22));
         frmInsertAsset.getContentPane().add(btnClear);
-        springLayout.putConstraint(SpringLayout.WEST, updateBtn, 70, SpringLayout.EAST, insertBtn);
-        springLayout.putConstraint(SpringLayout.EAST, updateBtn, 218, SpringLayout.EAST, insertBtn);
+        springLayout.putConstraint(SpringLayout.WEST, updateBtn, 30, SpringLayout.WEST, frmInsertAsset.getContentPane());
+        springLayout.putConstraint(SpringLayout.EAST, updateBtn, 268, SpringLayout.WEST, frmInsertAsset.getContentPane());
         
         excelBtn.setFont(new Font("Segoe UI Semilight", Font.PLAIN, 22));
         //frmInsertAsset.getContentPane().add(excelBtn);
@@ -879,8 +881,6 @@ public class InsertWindow {
         springLayout.putConstraint(SpringLayout.WEST, excelBtn, 76, SpringLayout.EAST, clearBtn);
         springLayout.putConstraint(SpringLayout.EAST, excelBtn, -175, SpringLayout.WEST, scrollPane_1);
         springLayout.putConstraint(SpringLayout.NORTH, deleteBtn, 0, SpringLayout.NORTH, insertBtn);
-        springLayout.putConstraint(SpringLayout.WEST, deleteBtn, 70, SpringLayout.EAST, updateBtn);
-        springLayout.putConstraint(SpringLayout.EAST, deleteBtn, -78, SpringLayout.WEST, scrollPane_1);
         deleteBtn.setFont(new Font("Segoe UI Semilight", Font.PLAIN, 22));
         frmInsertAsset.getContentPane().add(deleteBtn);
         
