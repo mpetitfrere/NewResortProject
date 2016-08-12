@@ -787,9 +787,16 @@ public class InsertWindow {
                 }
                 else
                     field2a.setText("");
+                if(testTable.getValueAt(row, 1) != null)
+                {
+                    field2b.setText(testTable.getValueAt(row, 2).toString());
+                }
+                else
+                    field2b.setText("");
+                
                 if(testTable.getValueAt(row, 2) != null)
                 {
-                    field3.setSelectedItem(testTable.getValueAt(row, 2).toString());
+                    field3.setSelectedItem(testTable.getValueAt(row, 3).toString());
                 }
                 else
                     field3.setSelectedIndex(0);
