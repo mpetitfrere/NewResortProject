@@ -400,7 +400,7 @@ public class InsertWindow {
         field2b.addKeyListener(new KeyAdapter() {
             public void keyReleased(KeyEvent e) {
                 try {
-                    getIntegerInput(field2a, e);
+                    getIntegerInput(field2b, e);
                 
                 } catch (NumberFormatException e1) {
                     // TODO Auto-generated catch block
