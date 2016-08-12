@@ -334,7 +334,7 @@ public class InsertWindow {
         PreparedStatement prepareUpdate = conn.prepareStatement(updateFieldsSQL);
         prepareUpdate.executeUpdate();
         prepareUpdate.getConnection().commit();
-        //System.out.println(ID);
+        System.out.println(updateFieldsSQL);
         UpDateTable();
         clearFields();
         prepareUpdate.close();
@@ -400,7 +400,7 @@ public class InsertWindow {
         field2b.addKeyListener(new KeyAdapter() {
             public void keyReleased(KeyEvent e) {
                 try {
-                    getIntegerInput(field2a, e);
+                    getIntegerInput(field2b, e);
                 
                 } catch (NumberFormatException e1) {
                     // TODO Auto-generated catch block
@@ -795,25 +795,25 @@ public class InsertWindow {
                     field3.setSelectedIndex(0);
                 if(testTable.getValueAt(row, 3) != null)
                 {
-                    field4.setText(testTable.getValueAt(row, 3).toString());
+                    field4.setText(testTable.getValueAt(row, 4).toString());
                 }
                 else
                     field4.setText("");
                 if(testTable.getValueAt(row, 4) != null)
                 {
-                    field5.setText(testTable.getValueAt(row, 4).toString());
+                    field5.setText(testTable.getValueAt(row, 5).toString());
                 }
                 else
                     field5.setText("");
                 if(testTable.getValueAt(row, 5) != null)
                 {
-                    field6.setText(testTable.getValueAt(row, 5).toString());
+                    field6.setText(testTable.getValueAt(row, 6).toString());
                 }
                 else
                     field6.setText("");
                 if(testTable.getValueAt(row, 6) != null)
                 {
-                    field7.setSelectedItem((testTable.getValueAt(row, 6).toString()));
+                    field7.setSelectedItem((testTable.getValueAt(row, 7).toString()));
                     
                 }
                 else
