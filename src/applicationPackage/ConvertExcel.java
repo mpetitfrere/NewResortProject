@@ -1,4 +1,5 @@
 package applicationPackage;
+
 //comment comment
 import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.util.SystemOutLogger;
@@ -21,12 +22,12 @@ import java.util.Date;
 import java.util.HashSet;
 import java.util.Iterator;
 
-
 /**
- *  Converts Data from JTable to excel
- *  boolean tempalteState, when true only writes the column header for excel
+ * Converts Data from JTable to excel boolean tempalteState, when true only
+ * writes the column header for excel
  */
 public class ConvertExcel {
+
 
     public static void exportExcel(boolean templateState)throws IOException, SQLException
     {
@@ -537,30 +538,5 @@ public class ConvertExcel {
 
 
     }
+
 }
-    //end of method
-    
-
-//    public static void main(String args[]) throws IOException
-//    {
-//        //writeExcel();
-//        long startTime = System.currentTimeMillis();
-//        //JTable table = new JTable();
-//        File  file = new File("C:\\Users\\Zelos\\Documents\\GitHub\\SpecsProject\\SpecsProject\\Excel\\ResortExcel.xlsx");
-//        
-//        try {
-//            importExcel(file);
-//        } catch (SQLException e) {
-//            // TODO Auto-generated catch block
-//            e.printStackTrace();
-//        }
-//        long endTime   = System.currentTimeMillis();
-//        long totalTime = endTime - startTime;
-//        SimpleDateFormat sdf = new SimpleDateFormat("mm:ss");
-//        Date resultdate = new Date(totalTime);
-//        //System.out.println(sdf.format(resultdate));
-//        System.out.println("SUCCESS");
-//
-//    }
-
-//}//End of ConvertExcel

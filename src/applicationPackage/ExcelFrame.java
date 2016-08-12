@@ -29,39 +29,39 @@ import java.util.Scanner;
 
 public class ExcelFrame extends JFrame {
 
-    private JPanel contentPane;
+	private JPanel contentPane;
 
+	/**
+	 * Launch the application.
+	 */
+	public static void main(String[] args) {
+		try {
+			// UIManager.setLookAndFeel("javax.swing.plaf.nimbus.NimbusLookAndFeel");
+		} catch (Throwable e) {
+			e.printStackTrace();
+		}
+		EventQueue.invokeLater(new Runnable() {
+			public void run() {
+				try {
+					ExcelFrame frame = new ExcelFrame();
+					frame.setVisible(true);
+					frame.setLocationRelativeTo(null);
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
+			}
+		});
+	}
 
-    /**
-     * Launch the application.
-     */
-    public static void main(String[] args) {
-        try {
-            //UIManager.setLookAndFeel("javax.swing.plaf.nimbus.NimbusLookAndFeel");
-        } catch (Throwable e) {
-            e.printStackTrace();
-        }
-        EventQueue.invokeLater(new Runnable() {
-            public void run() {
-                try {
-                    ExcelFrame frame = new ExcelFrame();
-                    frame.setVisible(true);
-                    frame.setLocationRelativeTo(null);
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
-            }
-        });
-    }
+	/**
+	 * Create the frame.
+	 */
+	public ExcelFrame() {
 
-    /**
-     * Create the frame.
-     */
-    public ExcelFrame() {
-    	
-    	UIManager.put("ToolTip.foreground", new ColorUIResource(Color.WHITE));
+		UIManager.put("ToolTip.foreground", new ColorUIResource(Color.WHITE));
 		UIManager.put("ToolTip.background", new ColorUIResource(new Color(0, 155, 167)));
 		UIManager.put("ToolTip.font", new FontUIResource("Segoe UI Semilight", Font.BOLD, 20));
+
 
     	addWindowListener(new WindowAdapter()
         {

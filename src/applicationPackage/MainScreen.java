@@ -25,11 +25,9 @@ import java.awt.Toolkit;
 
 import java.net.URISyntaxException;
 
-
 public class MainScreen extends JApplet {
 
 	public static JFrame frame;
-
 
 	public static void main(String[] args) {
 		SwingUtilities.invokeLater(() -> {
@@ -40,7 +38,6 @@ public class MainScreen extends JApplet {
 			}
 		});
 	}
-
 
 	public MainScreen() throws URISyntaxException {
 		super();
@@ -55,7 +52,6 @@ public class MainScreen extends JApplet {
 	 */
 	@Override
 	public void init() {
-
 
 		frame = new JFrame();
 		ImageIcon icon = new ImageIcon(getClass().getResource("/Resources/appIconImage-2.png"));
@@ -143,8 +139,7 @@ public class MainScreen extends JApplet {
 		excelIcon.setHorizontalAlignment(SwingConstants.CENTER);
 		excelIcon.setBounds(965, 250, 394, 301);
 		frame.getContentPane().add(excelIcon);
-		
-		
+
 		excelIcon.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseEntered(MouseEvent e) {
@@ -168,7 +163,7 @@ public class MainScreen extends JApplet {
 				}
 			}
 		});
-		
+
 		JLabel lblNewLabel = new JLabel("New label");
 		lblNewLabel.setIcon(new ImageIcon(MainScreen.class.getResource("/Resources/bottomBorder.png")));
 		lblNewLabel.setHorizontalAlignment(SwingConstants.CENTER);
