@@ -82,7 +82,7 @@ public class InsertWindow {
     private String autoIDString;
     private String deleteItemString;
     private TextAutoCompleter complete;
- 
+    int[] selection;
 
     // instantiating textfields for each jlabel
     private JTextField field1 = new JTextField();
@@ -92,6 +92,8 @@ public class InsertWindow {
     private JTextField field5 = new JTextField();
     private JTextField field6 = new JTextField();    
     private JComboBox field7 = new JComboBox();
+    private JTextField endYearField = new JTextField();    
+
     private JButton updateBtn;
     private JButton clearBtn;
     private JButton excelBtn;
@@ -163,8 +165,6 @@ public class InsertWindow {
         getInputFromFields();
         actionPerformedBtn();
         autoComplete();
-
-        
 
         frmInsertAsset.addWindowListener(new WindowAdapter()
             {
@@ -259,14 +259,39 @@ public class InsertWindow {
             }
 
             private void deleteItem() throws SQLException {
-            
-                PreparedStatement prepareDel = conn.prepareStatement(deleteItemString);
-                prepareDel.executeUpdate();
-                prepareDel.getConnection().commit();
+           
+                String defaultField1 = "EMPTY";
+                String defaultField2 = "0000";
+                String defaultField3 = "EMPTY";
+                String updateFieldsSQL;
+                PreparedStatement prepareUpdate = null;
+
+                if(selection != null)
+                {
+                	for(int i=0; i<selection.length; i++){
+                		updateFieldsSQL = "UPDATE `new_schema`.`ResortManagement` SET `AssociationName`='" + defaultField1 +"', "
+                				+ "`Year`='" + defaultField2 + "', "
+                				+ "`Type`='" + defaultField3 + "', "
+                				+ "`Aisle`='" + String.valueOf(testTable.getModel().getValueAt(selection[i], 3))+ "', "
+                				+ "`Row`='" + String.valueOf(testTable.getModel().getValueAt(selection[i], 4)) + "', "
+                				+ "`Column`='" + String.valueOf(testTable.getModel().getValueAt(selection[i], 5)) + "', "
+                				+ "`Depth`='" + String.valueOf(testTable.getModel().getValueAt(selection[i], 6)) + "' "
+                				+ " WHERE `ID`='" + String.valueOf(testTable.getModel().getValueAt(selection[i], 7))+ "'";
+                		System.out.println(updateFieldsSQL);
+                		prepareUpdate = conn.prepareStatement(updateFieldsSQL);
+                		prepareUpdate.executeUpdate();
+                		prepareUpdate.getConnection().commit();
+                        UpDateTable();
+                		addTypes();
+                }
+
+
+                }
+                
+                prepareUpdate.close();
                 UpDateTable();
                 autoComplete();
                 JOptionPane.showMessageDialog(null, "Successfully deleted item: " + field1.getText());
-                prepareDel.close();
                 //conn.close();
             }
         });
@@ -348,40 +373,6 @@ public class InsertWindow {
 				
 			}});
         
-        field1.addMouseListener(new MouseListener(){
-
-            @Override
-            public void mouseClicked(MouseEvent e) {
-            	JTextField jf = (JTextField) e.getSource();
-                System.out.println("Doctor: " + jf.getText());
-            }
-
-		
-
-			@Override
-			public void mouseEntered(MouseEvent arg0) {
-				// TODO Auto-generated method stub
-				
-			}
-
-			@Override
-			public void mouseExited(MouseEvent arg0) {
-				// TODO Auto-generated method stub
-				
-			}
-
-			@Override
-			public void mousePressed(MouseEvent arg0) {
-				// TODO Auto-generated method stub
-				
-			}
-
-			@Override
-			public void mouseReleased(MouseEvent arg0) {
-				// TODO Auto-generated method stub
-				
-			}});
-    
         
         field2.addKeyListener(new KeyAdapter() {
             public void keyReleased(KeyEvent e) {
@@ -488,7 +479,8 @@ public class InsertWindow {
         }
     }
 
-    private void getTypes() throws SQLException {
+    private void getTypes() throws SQLException 
+    {
         //field3
         prepare.setString(3, field3.getSelectedItem().toString());
 
@@ -671,11 +663,13 @@ public class InsertWindow {
         Object[] fields = {
                 "Association Name:    ", field1,
                 "Year:    ", field2,
+                "Year:      ", endYearField,
                 "Type:    ", field3,
                 "Aisle:    ", field4,
                 "Row:    ", field5,
                 "Column:    ", field6,
                 "Depth:    ", field7
+                
         };
         int i=0;
         while (i < fields.length) {
@@ -685,6 +679,18 @@ public class InsertWindow {
             g1_Jpanel.add((Component) fields[i++]);
         }
 	    
+        field4.setEnabled(false);
+        field5.setEnabled(false);
+        field6.setEnabled(false);
+        field7.setEnabled(false);
+        
+        field4.setDisabledTextColor(Color.BLACK);
+        field5.setDisabledTextColor(Color.BLACK);
+        field6.setDisabledTextColor(Color.BLACK);
+       
+
+
+
         field7.addItem("B");
         field7.addItem("F");
         setTextFieldName();
@@ -739,9 +745,12 @@ public class InsertWindow {
             //    // the textboxes
             @Override
             public void mouseReleased(java.awt.event.MouseEvent evt) {
+            	//Grabs the indices form table
+                selection = testTable.getSelectedRows();
+                             
                 int row = testTable.getSelectedRow();    
                 //Gets text from row and fills jtext if cell is not empty
-                
+
                 if(testTable.getValueAt(row, 0) != null)
                 {
                     field1.setText(testTable.getValueAt(row, 0).toString());
@@ -792,6 +801,8 @@ public class InsertWindow {
                         + " AND `Row` = '" + field5.getText() + "' " + "AND `Column` ='" + field6.getText() +"' "
                         + "AND `Depth` ='"+ field7.getSelectedItem().toString() + "'";
                 
+                
+                
                 try {
                     getPrepareValues();
                 } catch (SQLException e) {
@@ -803,7 +814,10 @@ public class InsertWindow {
         });
         
     }//End of setupTable
-
+    
+  
+    
+    
     private void setupFrame()
     {
         frmInsertAsset.setVisible(true);
