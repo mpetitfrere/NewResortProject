@@ -86,13 +86,14 @@ public class InsertWindow {
 
     // instantiating textfields for each jlabel
     private JTextField field1 = new JTextField();
-    private JTextField field2 = new JTextField();
+    private JTextField field2a = new JTextField();
+    private JTextField field2b = new JTextField();
+
     private JComboBox field3 = new JComboBox();
     private JTextField field4 = new JTextField();
     private JTextField field5 = new JTextField();
     private JTextField field6 = new JTextField();    
     private JComboBox field7 = new JComboBox();
-    private JTextField endYearField = new JTextField();    
 
     private JButton updateBtn;
     private JButton clearBtn;
@@ -316,12 +317,20 @@ public class InsertWindow {
             prepareID.close();
             resultsetID.close();
         }
-    
+
+        String defaultField1 = "EMPTY";
+        String defaultField2 = "0000";
+        String defaultField3 = "EMPTY";
+        
         String updateFieldsSQL = "UPDATE `new_schema`.`ResortManagement` SET `AssociationName`='" + field1.getText() +"', "
-                + "`Year`='" + field2.getText() + "', `Type`='" + field3.getSelectedItem().toString() + "', "
-                + "`Aisle`='" + field4.getText() + "', `Row`='" + field5.getText() + "', `Column`='" + field6.getText() 
-                + "', `Depth`='" + field7.getSelectedItem().toString() + "' "
-                + "WHERE `ID`='" + String.valueOf(ID)+ "'";
+				+ "`StartYear`='" + field2a.getText()  + "', "
+				+ "`EndYear`='" + field2b.getText()  + "', "
+			    + "`Type`='" + field3.getSelectedItem().toString()   + "', "
+				+ "`Aisle`='" + field4.getText() + "', "
+				+ "`Row`='" + field5.getText() + "', "
+				+ "`Column`='" + field6.getText() + "', "
+				+ "`Depth`='" + field7.getSelectedItem().toString() + "' "
+				+ " WHERE `ID`='" + String.valueOf(ID) + "'";
         PreparedStatement prepareUpdate = conn.prepareStatement(updateFieldsSQL);
         prepareUpdate.executeUpdate();
         prepareUpdate.getConnection().commit();
@@ -376,10 +385,22 @@ public class InsertWindow {
 			}});
         
         
-        field2.addKeyListener(new KeyAdapter() {
+        field2a.addKeyListener(new KeyAdapter() {
             public void keyReleased(KeyEvent e) {
                 try {
-                    getIntegerInput(field2, e);
+                    getIntegerInput(field2a, e);
+                
+                } catch (NumberFormatException e1) {
+                    // TODO Auto-generated catch block
+                    e1.printStackTrace();
+                }
+            }
+        });
+        
+        field2b.addKeyListener(new KeyAdapter() {
+            public void keyReleased(KeyEvent e) {
+                try {
+                    getIntegerInput(field2a, e);
                 
                 } catch (NumberFormatException e1) {
                     // TODO Auto-generated catch block
@@ -575,7 +596,7 @@ public class InsertWindow {
                 @Override
                 public Class getColumnClass(int c) {
                     //System.out.println(getValueAt(0, c).getClass().toString());
-                    if(c == 1 || c==3 || c==4 || c==5  )
+                    if(c == 1 || c==4 || c==5 || c==6  )
                     {
                         return Integer.class;
                     }
@@ -613,7 +634,7 @@ public class InsertWindow {
         int count = 0;
         while(rs.next()){
             for(int i=0;i<cols;i++){
-                if(i == 1 || i==3 || i==4 || i==5)
+                if(i == 1 || i==4 || i==5 || i==6)
                 {
                     row[i]=Integer.parseInt(rs.getString(i+1));
                 }
@@ -635,8 +656,8 @@ public class InsertWindow {
             // TODO Auto-generated catch block
             e.printStackTrace();
         }
-        String query = "INSERT into `new_schema`.`ResortManagement` (`AssociationName`, `Year`, `Type`, `Aisle`, `Row`, `Column`, `Depth`) "
-                + "values (?,?,?,?,?,?,?)";
+        String query = "INSERT into `new_schema`.`ResortManagement` (`AssociationName`, `StartYear`, `EndYear`, `Type`, `Aisle`, `Row`, `Column`, `Depth`) "
+                + "values (?,?,?,?,?,?,?,?)";
          
         prepare = conn.prepareStatement(query);
     }
@@ -664,8 +685,8 @@ public class InsertWindow {
     {
         Object[] fields = {
                 "Association Name:    ", field1,
-                "Year:    ", field2,
-                "Year:      ", endYearField,
+                "Start Year:    ", field2a,
+                "End Year:      ", field2b,
                 "Type:    ", field3,
                 "Aisle:    ", field4,
                 "Row:    ", field5,
@@ -704,7 +725,8 @@ public class InsertWindow {
         //Global Variables
         autoIDString = "SELECT  ID FROM new_schema.ResortManagement "
                 + "WHERE `AssociationName` LIKE '" + field1.getText() +"%' "
-                + "AND `Year` LIKE '" + field2.getText() +"%' "
+                + "AND `StartYear` LIKE '" + field2a.getText() +"%' "
+                + "AND `EndYear` LIKE '" + field2b.getText() +"%' "
                 + "AND `Type` LIKE '" + field3.getSelectedItem().toString() +"%'"
                 + "AND `Aisle` LIKE '" + field4.getText() +"%' "
                 + "AND `Row`   LIKE '" + field5.getText() +"%' "
@@ -761,10 +783,10 @@ public class InsertWindow {
                     field1.setText("");
                 if(testTable.getValueAt(row, 1) != null)
                 {
-                    field2.setText(testTable.getValueAt(row, 1).toString());
+                    field2a.setText(testTable.getValueAt(row, 1).toString());
                 }
                 else
-                    field2.setText("");
+                    field2a.setText("");
                 if(testTable.getValueAt(row, 2) != null)
                 {
                     field3.setSelectedItem(testTable.getValueAt(row, 2).toString());
@@ -954,18 +976,20 @@ public class InsertWindow {
     private void setTextFieldName()
     {
         field1.setName("1");
-        field2.setName("2");
-        field3.setName("3");
-        field4.setName("4");
-        field5.setName("5");
-        field6.setName("6");
-        field7.setName("7");
+        field2a.setName("2");
+        field2b.setName("3");
+        field3.setName("4");
+        field4.setName("5");
+        field5.setName("6");
+        field6.setName("7");
+        field7.setName("8");
         
     }
     private void setFont(){
         Font font = new Font("Segoe UI Semilight", Font.PLAIN, 20);
         field1.setFont(font);
-        field2.setFont(font);
+        field2a.setFont(font);
+        field2b.setFont(font);
         field3.setFont(font);
         field4.setFont(font);
         field5.setFont(font);
@@ -975,7 +999,8 @@ public class InsertWindow {
     }
     private boolean isFieldsEmpty()
     {
-        if((field1.getText().equals("") || field2.getText().equals("") || field4.getText().equals("")
+        if((field1.getText().equals("") || field2a.getText().equals("") 
+        		|| field2b.getText().equals("") || field4.getText().equals("")
             ||field5.getText().equals("") || field6.getText().equals("")) 
                 || isField3Empty() )
         {
@@ -995,7 +1020,8 @@ public class InsertWindow {
     private void clearFields()
     {
         field1.setText("");
-        field2.setText("");
+        field2a.setText("");
+        field2b.setText("");
         field3.setSelectedIndex(0);
         field4.setText("");
         field5.setText("");
@@ -1004,7 +1030,7 @@ public class InsertWindow {
     }
     private boolean validateFields()
     {
-        if(field2.getText().length() !=4)
+        if(field2a.getText().length() !=4 || field2b.getText().length() !=4)
         {
             JOptionPane.showMessageDialog(null, "Year must be ented in this format: YYYY "  , "Error", JOptionPane.ERROR_MESSAGE);
             return false;
@@ -1033,7 +1059,7 @@ public class InsertWindow {
     private void getPrepareValues() throws SQLException
     {
         prepare.setString(1, field1.getText());
-        prepare.setInt(2, Integer.parseInt(field2.getText()));
+        prepare.setInt(2, Integer.parseInt(field2a.getText()));
         prepare.setString(3, field3.getSelectedItem().toString());
         prepare.setInt(4, Integer.parseInt(field4.getText()));
         prepare.setInt(5, Integer.parseInt(field5.getText()));
