@@ -6,6 +6,7 @@ import java.awt.Dimension;
 import java.awt.EventQueue;
 import java.awt.Font;
 import java.awt.GridLayout;
+import java.awt.List;
 import java.awt.Toolkit;
 import java.awt.Window;
 import java.awt.event.MouseAdapter;
@@ -268,26 +269,40 @@ public class InsertWindow {
                 String defaultField2b = "0000";
                 String defaultField3 = "";
                 String updateFieldsSQL;
+                String getId = "";
                 PreparedStatement prepareUpdate = null;
+                ArrayList<String> IDs = new ArrayList<String>();
 
                 if(selection != null)
                 {
                 	for(int i=0; i<selection.length; i++){
-                		updateFieldsSQL = "UPDATE `new_schema`.`ResortManagement` SET `AssociationName`='" + defaultField1 +"', "
-                				+ "`StartYear`='" + defaultField2a + "', "
-                				+ "`EndYear`='" + defaultField2b + "', "
-                				+ "`Type`='" + defaultField3 + "', "
-                				+ "`Aisle`='" + String.valueOf(testTable.getModel().getValueAt(selection[i], 4))+ "', "
-                				+ "`Row`='" + String.valueOf(testTable.getModel().getValueAt(selection[i], 5)) + "', "
-                				+ "`Column`='" + String.valueOf(testTable.getModel().getValueAt(selection[i], 6)) + "', "
-                				+ "`Depth`='" + String.valueOf(testTable.getModel().getValueAt(selection[i], 7)) + "' "
-                				+ " WHERE `ID`='" + String.valueOf(testTable.getModel().getValueAt(selection[i], 8))+ "'";
-                		System.out.println(updateFieldsSQL);
-                		prepareUpdate = conn.prepareStatement(updateFieldsSQL);
-                		prepareUpdate.executeUpdate();
-                		prepareUpdate.getConnection().commit();
+                		getId = "'" + String.valueOf(testTable.getModel().getValueAt(selection[i], 8)) + "'";
+                		IDs.add(getId);
+                		if(i==selection.length-1){
+                			
+                		} else{
+                			IDs.add(", ");
+                		}
                         
                 }
+                	StringBuilder sb = new StringBuilder();
+                	for (String s : IDs)
+                	{
+                	    sb.append(s);
+                	    //sb.append(", ");
+                	}
+
+                	System.out.println(sb.toString());
+                	
+                	updateFieldsSQL = "UPDATE `new_schema`.`ResortManagement` SET `AssociationName`='" + defaultField1 +"', "
+            				+ "`StartYear`='" + defaultField2a + "', "
+            				+ "`EndYear`='" + defaultField2b + "', "
+            				+ "`Type`='" + defaultField3 + "' "
+            				+ " WHERE `ID` IN (" + sb.toString() + ")";
+            		System.out.println(updateFieldsSQL);
+            		prepareUpdate = conn.prepareStatement(updateFieldsSQL);
+            		prepareUpdate.executeUpdate();
+            		prepareUpdate.getConnection().commit();
 
 
                 }
