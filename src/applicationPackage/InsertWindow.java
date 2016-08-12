@@ -263,9 +263,10 @@ public class InsertWindow {
 
             private void deleteItem() throws SQLException {
            
-                String defaultField1 = "EMPTY";
-                String defaultField2 = "0000";
-                String defaultField3 = "EMPTY";
+                String defaultField1 = "********";
+                String defaultField2a = "0000";
+                String defaultField2b = "0000";
+                String defaultField3 = "";
                 String updateFieldsSQL;
                 PreparedStatement prepareUpdate = null;
 
@@ -273,24 +274,25 @@ public class InsertWindow {
                 {
                 	for(int i=0; i<selection.length; i++){
                 		updateFieldsSQL = "UPDATE `new_schema`.`ResortManagement` SET `AssociationName`='" + defaultField1 +"', "
-                				+ "`Year`='" + defaultField2 + "', "
+                				+ "`StartYear`='" + defaultField2a + "', "
+                				+ "`EndYear`='" + defaultField2b + "', "
                 				+ "`Type`='" + defaultField3 + "', "
-                				+ "`Aisle`='" + String.valueOf(testTable.getModel().getValueAt(selection[i], 3))+ "', "
-                				+ "`Row`='" + String.valueOf(testTable.getModel().getValueAt(selection[i], 4)) + "', "
-                				+ "`Column`='" + String.valueOf(testTable.getModel().getValueAt(selection[i], 5)) + "', "
-                				+ "`Depth`='" + String.valueOf(testTable.getModel().getValueAt(selection[i], 6)) + "' "
-                				+ " WHERE `ID`='" + String.valueOf(testTable.getModel().getValueAt(selection[i], 7))+ "'";
+                				+ "`Aisle`='" + String.valueOf(testTable.getModel().getValueAt(selection[i], 4))+ "', "
+                				+ "`Row`='" + String.valueOf(testTable.getModel().getValueAt(selection[i], 5)) + "', "
+                				+ "`Column`='" + String.valueOf(testTable.getModel().getValueAt(selection[i], 6)) + "', "
+                				+ "`Depth`='" + String.valueOf(testTable.getModel().getValueAt(selection[i], 7)) + "' "
+                				+ " WHERE `ID`='" + String.valueOf(testTable.getModel().getValueAt(selection[i], 8))+ "'";
                 		System.out.println(updateFieldsSQL);
                 		prepareUpdate = conn.prepareStatement(updateFieldsSQL);
                 		prepareUpdate.executeUpdate();
                 		prepareUpdate.getConnection().commit();
-                        UpDateTable();
-                		addTypes();
+                        
                 }
 
 
                 }
-                
+                //UpDateTable();
+        		addTypes();
                 prepareUpdate.close();
                 UpDateTable();
                 autoComplete();
