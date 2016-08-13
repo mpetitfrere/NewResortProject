@@ -187,7 +187,9 @@ public class InsertWindow {
         updateBtn.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 try {
-                    updateItems();
+                	String var = "update";
+                    updateItems(var);
+                    
                 } catch (SQLException e1) {
                     // TODO Auto-generated catch block
                     e1.printStackTrace();
@@ -255,112 +257,182 @@ public class InsertWindow {
         deleteBtn.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 try {
-                    deleteItem();
+                	String var = "delete";
+                    updateItems(var);
                 } catch (SQLException e1) {
                     // TODO Auto-generated catch block
                     e1.printStackTrace();
                 }        
             }
 
-            private void deleteItem() throws SQLException {
-           
-                String defaultField1 = "********";
-                String defaultField2a = "0000";
-                String defaultField2b = "0000";
-                String defaultField3 = "";
-                String updateFieldsSQL;
-                String getId = "";
-                PreparedStatement prepareUpdate = null;
-                ArrayList<String> IDs = new ArrayList<String>();
-
-                if(selection != null)
-                {
-                	for(int i=0; i<selection.length; i++){
-                		getId = "'" + String.valueOf(testTable.getModel().getValueAt(selection[i], 8)) + "'";
-                		IDs.add(getId);
-                		if(i==selection.length-1){
-                			
-                		} else{
-                			IDs.add(", ");
-                		}
-                        
-                }
-                	StringBuilder sb = new StringBuilder();
-                	for (String s : IDs)
-                	{
-                	    sb.append(s);
-                	    //sb.append(", ");
-                	}
-
-                	System.out.println(sb.toString());
-                	
-                	updateFieldsSQL = "UPDATE `new_schema`.`ResortManagement` SET `AssociationName`='" + defaultField1 +"', "
-            				+ "`StartYear`='" + defaultField2a + "', "
-            				+ "`EndYear`='" + defaultField2b + "', "
-            				+ "`Type`='" + defaultField3 + "' "
-            				+ " WHERE `ID` IN (" + sb.toString() + ")";
-            		System.out.println(updateFieldsSQL);
-            		prepareUpdate = conn.prepareStatement(updateFieldsSQL);
-            		prepareUpdate.executeUpdate();
-            		prepareUpdate.getConnection().commit();
-
-
-                }
-                //UpDateTable();
-        		addTypes();
-                prepareUpdate.close();
-                UpDateTable();
-                autoComplete();
-                JOptionPane.showMessageDialog(null, "Successfully deleted item: " + field1.getText());
-                //conn.close();
-            }
+         
         });
         
     }
     
-    private void updateItems() throws SQLException {
-        int ID = 0;
-        
-        PreparedStatement prepareID = conn.prepareStatement(autoIDString);
-        ResultSet resultsetID = prepareID.executeQuery();
-        if(resultsetID.next() && resultsetID.getInt(1) > 0 )
-        {
-            //System.out.println(resultsetID.getInt(1));
-            ID = resultsetID.getInt(1);
-            prepareID.close();
-            resultsetID.close();
-        }
-        else{
-            prepareID.close();
-            resultsetID.close();
-        }
+    private void updateItems(String key) throws SQLException {
 
-        String defaultField1 = "EMPTY";
-        String defaultField2 = "0000";
-        String defaultField3 = "EMPTY";
-        
-        String updateFieldsSQL = "UPDATE `new_schema`.`ResortManagement` SET `AssociationName`='" + field1.getText() +"', "
-				+ "`StartYear`='" + field2a.getText()  + "', "
-				+ "`EndYear`='" + field2b.getText()  + "', "
-			    + "`Type`='" + field3.getSelectedItem().toString()   + "', "
-				+ "`Aisle`='" + field4.getText() + "', "
-				+ "`Row`='" + field5.getText() + "', "
-				+ "`Column`='" + field6.getText() + "', "
-				+ "`Depth`='" + field7.getSelectedItem().toString() + "' "
-				+ " WHERE `ID`='" + String.valueOf(ID) + "'";
-        PreparedStatement prepareUpdate = conn.prepareStatement(updateFieldsSQL);
-        prepareUpdate.executeUpdate();
-        prepareUpdate.getConnection().commit();
-        System.out.println(updateFieldsSQL);
-        UpDateTable();
-        clearFields();
-        prepareUpdate.close();
-        autoComplete();
-        //conn.close();
-        JOptionPane.showMessageDialog(null, "Successfully updated item.", "Update" , JOptionPane.INFORMATION_MESSAGE);
+    	String defaultField1 = null;
+    	String defaultField2a = null;
+    	String defaultField2b = null;
+    	String defaultField3 = null;
+    	//delete
+    	int length = selection.length;
+    	int maxID;
+    	int [] aisleArray = null;
+    	int [] rowArray = null;
+    	int [] columnArray = null;
+    	String [] depthArray = null;
+    
+    	if(key.equals("delete"))
+    	{
+    		defaultField1 = "********";
+    		defaultField2a = "0000";
+    		defaultField2b = "0000";
+    		defaultField3 = "";
+    		
+    		
+    		aisleArray = new int[length];
+        	rowArray =  new int[length];
+        	columnArray =  new int[length];
+        	depthArray =  new String[length];
+    	}
+    	else
+    	{
+    		defaultField1 = field1.getText();
+    		defaultField2a = field2a.getText();
+    		defaultField2b = field2b.getText();
+    		defaultField3 =  field3.getSelectedItem().toString();
+    	}
+    	String updateFieldsSQL;
+    	String getId = "";
+    	PreparedStatement prepareUpdate = null;
+    	ArrayList<String> IDs = new ArrayList<String>();
 
-        
+    	if(selection != null)
+    	{
+    		for(int i=0; i<selection.length; i++){
+    			getId = "'" + String.valueOf(testTable.getModel().getValueAt(selection[i], 8)) + "'";
+    			IDs.add(getId);
+    			//gets aisle,row, colum,depth
+    			aisleArray[i] = (int) testTable.getModel().getValueAt(selection[i], 4);
+    			//System.out.println(aisleArray[i] );
+    			rowArray[i] =  (int) testTable.getModel().getValueAt(selection[i], 5);
+    			columnArray[i] = (int) testTable.getModel().getValueAt(selection[i], 6);
+    			depthArray[i] = (String) testTable.getModel().getValueAt(selection[i], 7);
+
+    			if(i==selection.length-1){
+    				maxID = selection[i];
+    			} else{
+    				IDs.add(", ");
+    			}
+
+    		}
+    		StringBuilder sb = new StringBuilder();
+    		for (String s : IDs)
+    		{
+    			sb.append(s);
+    			//sb.append(", ");
+    		}
+
+    		//System.out.println(sb.toString());
+    		
+
+    		if(key == "delete")
+    		{
+    			updateFieldsSQL = "DELETE FROM `new_schema`.`ResortManagement` "
+        				+ " WHERE `ID` IN (" + sb.toString() + ")";
+        		//System.out.println(updateFieldsSQL);
+        		
+        		prepareUpdate = conn.prepareStatement(updateFieldsSQL);
+        		prepareUpdate.executeUpdate();
+        		prepareUpdate.getConnection().commit();
+
+        		String query = "INSERT into `new_schema`.`ResortManagement` (`AssociationName`, `StartYear`, `EndYear`, `Type`, `Aisle`, `Row`, `Column`, `Depth`) "
+        	                + "values (?,?,?,?,"
+        	                + "?,?,?,?)";
+        		prepareUpdate = conn.prepareStatement(query);
+
+        		for(int i=0;i<length;i++)
+        		{
+        			
+        			prepareUpdate.setString(1, defaultField1);
+        			prepareUpdate.setInt(2, Integer.parseInt(defaultField2a));
+        			prepareUpdate.setInt(3, Integer.parseInt(defaultField2b));
+        			prepareUpdate.setString(4, defaultField3);
+        			
+        			prepareUpdate.setInt(5, aisleArray[i]);
+        			prepareUpdate.setInt(6, rowArray[i]);
+        			prepareUpdate.setInt(7, columnArray[i]);
+        			prepareUpdate.setString(8, depthArray[i]);
+        			prepareUpdate.addBatch();
+
+        		}
+        		prepareUpdate.executeBatch();
+        		//prepareUpdate.getConnection().commit();
+            	prepareUpdate.close();
+
+    		}
+    		else
+    		{
+    			updateFieldsSQL = "UPDATE `new_schema`.`ResortManagement` SET `AssociationName`='" + defaultField1 +"', "
+        				+ "`StartYear`='" + defaultField2a + "', "
+        				+ "`EndYear`='" + defaultField2b + "', "
+        				+ "`Type`='" + defaultField3 + "' "
+        				+ " WHERE `ID` IN (" + sb.toString() + ")";
+        		//System.out.println(updateFieldsSQL);
+        		
+        		prepareUpdate = conn.prepareStatement(updateFieldsSQL);
+        		prepareUpdate.executeUpdate();
+        		prepareUpdate.getConnection().commit();
+            	prepareUpdate.close();
+
+    			
+    		}
+    		
+
+
+    	}
+    	//UpDateTable();
+    	addTypes();
+    	UpDateTable();
+    	autoComplete();
+    	JOptionPane.showMessageDialog(null, "Successfully deleted item: " + field1.getText());
+    	//conn.close();
     }
+//    private void updateItems() throws SQLException {
+//        int ID = 0;
+//        
+//        PreparedStatement prepareID = conn.prepareStatement(autoIDString);
+//
+//
+//        String defaultField1 = "EMPTY";
+//        String defaultField2 = "0000";
+//        String defaultField3 = "EMPTY";
+//        PreparedStatement prepareUpdate;
+//        
+//        String updateFieldsSQL = "UPDATE `new_schema`.`ResortManagement` SET `AssociationName`='" + field1.getText() +"', "
+//				+ "`StartYear`='" + field2a.getText()  + "', "
+//				+ "`EndYear`='" + field2b.getText()  + "', "
+//			    + "`Type`='" + field3.getSelectedItem().toString()   + "', "
+//				+ "`Aisle`='" + field4.getText() + "', "
+//				+ "`Row`='" + field5.getText() + "', "
+//				+ "`Column`='" + field6.getText() + "', "
+//				+ "`Depth`='" + field7.getSelectedItem().toString() + "' "
+//				+ " WHERE `ID`='" + String.valueOf(testTable.getModel().getValueAt(selection[0], 8)) + "'";
+//       prepareUpdate = conn.prepareStatement(updateFieldsSQL);
+//        prepareUpdate.executeUpdate();
+//        prepareUpdate.getConnection().commit();
+//        System.out.println(updateFieldsSQL);
+//        UpDateTable();
+//        clearFields();
+//        prepareUpdate.close();
+//        autoComplete();
+//        //conn.close();
+//        JOptionPane.showMessageDialog(null, "Successfully updated item.", "Update" , JOptionPane.INFORMATION_MESSAGE);
+//
+//        
+//    }
 
     private void getInputFromFields() throws NumberFormatException, SQLException {
         
@@ -628,6 +700,8 @@ public class InsertWindow {
             addRowsAndColumns(rsTest, dm);
 
             testTable.setModel(dm);
+            totalLabel.setText("Total number of items: " + testTable.getRowCount());
+
             refreshScreen();
             //conn.close();
         
@@ -661,7 +735,6 @@ public class InsertWindow {
             count++;
             dm.addRow(row);
         }
-        totalLabel.setText("Total number of items: " + count);
     }
     
     public void initPrepareStatment() throws SQLException
