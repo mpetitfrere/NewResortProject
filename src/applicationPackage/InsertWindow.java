@@ -276,12 +276,26 @@ public class InsertWindow {
     	String defaultField2a = null;
     	String defaultField2b = null;
     	String defaultField3 = null;
+    	//delete
+    	int length = selection.length;
+    	int maxID;
+    	int [] aisleArray = null;
+    	int [] rowArray = null;
+    	int [] columnArray = null;
+    	String [] depthArray = null;
+    
     	if(key.equals("delete"))
     	{
     		defaultField1 = "********";
     		defaultField2a = "0000";
     		defaultField2b = "0000";
     		defaultField3 = "";
+    		
+    		
+    		aisleArray = new int[length];
+        	rowArray =  new int[length];
+        	columnArray =  new int[length];
+        	depthArray =  new String[length];
     	}
     	else
     	{
@@ -300,8 +314,15 @@ public class InsertWindow {
     		for(int i=0; i<selection.length; i++){
     			getId = "'" + String.valueOf(testTable.getModel().getValueAt(selection[i], 8)) + "'";
     			IDs.add(getId);
-    			if(i==selection.length-1){
+    			//gets aisle,row, colum,depth
+    			aisleArray[i] = (int) testTable.getModel().getValueAt(selection[i], 4);
+    			//System.out.println(aisleArray[i] );
+    			rowArray[i] =  (int) testTable.getModel().getValueAt(selection[i], 5);
+    			columnArray[i] = (int) testTable.getModel().getValueAt(selection[i], 6);
+    			depthArray[i] = (String) testTable.getModel().getValueAt(selection[i], 7);
 
+    			if(i==selection.length-1){
+    				maxID = selection[i];
     			} else{
     				IDs.add(", ");
     			}
@@ -314,24 +335,66 @@ public class InsertWindow {
     			//sb.append(", ");
     		}
 
-    		System.out.println(sb.toString());
+    		//System.out.println(sb.toString());
     		
 
-    		updateFieldsSQL = "UPDATE `new_schema`.`ResortManagement` SET `AssociationName`='" + defaultField1 +"', "
-    				+ "`StartYear`='" + defaultField2a + "', "
-    				+ "`EndYear`='" + defaultField2b + "', "
-    				+ "`Type`='" + defaultField3 + "' "
-    				+ " WHERE `ID` IN (" + sb.toString() + ")";
-    		System.out.println(updateFieldsSQL);
-    		prepareUpdate = conn.prepareStatement(updateFieldsSQL);
-    		prepareUpdate.executeUpdate();
-    		prepareUpdate.getConnection().commit();
+    		if(key == "delete")
+    		{
+    			updateFieldsSQL = "DELETE FROM `new_schema`.`ResortManagement` "
+        				+ " WHERE `ID` IN (" + sb.toString() + ")";
+        		//System.out.println(updateFieldsSQL);
+        		
+        		prepareUpdate = conn.prepareStatement(updateFieldsSQL);
+        		prepareUpdate.executeUpdate();
+        		prepareUpdate.getConnection().commit();
+
+        		String query = "INSERT into `new_schema`.`ResortManagement` (`AssociationName`, `StartYear`, `EndYear`, `Type`, `Aisle`, `Row`, `Column`, `Depth`) "
+        	                + "values (?,?,?,?,"
+        	                + "?,?,?,?)";
+        		prepareUpdate = conn.prepareStatement(query);
+
+        		for(int i=0;i<length;i++)
+        		{
+        			
+        			prepareUpdate.setString(1, defaultField1);
+        			prepareUpdate.setInt(2, Integer.parseInt(defaultField2a));
+        			prepareUpdate.setInt(3, Integer.parseInt(defaultField2b));
+        			prepareUpdate.setString(4, defaultField3);
+        			
+        			prepareUpdate.setInt(5, aisleArray[i]);
+        			prepareUpdate.setInt(6, rowArray[i]);
+        			prepareUpdate.setInt(7, columnArray[i]);
+        			prepareUpdate.setString(8, depthArray[i]);
+        			prepareUpdate.addBatch();
+
+        		}
+        		prepareUpdate.executeBatch();
+        		//prepareUpdate.getConnection().commit();
+            	prepareUpdate.close();
+
+    		}
+    		else
+    		{
+    			updateFieldsSQL = "UPDATE `new_schema`.`ResortManagement` SET `AssociationName`='" + defaultField1 +"', "
+        				+ "`StartYear`='" + defaultField2a + "', "
+        				+ "`EndYear`='" + defaultField2b + "', "
+        				+ "`Type`='" + defaultField3 + "' "
+        				+ " WHERE `ID` IN (" + sb.toString() + ")";
+        		//System.out.println(updateFieldsSQL);
+        		
+        		prepareUpdate = conn.prepareStatement(updateFieldsSQL);
+        		prepareUpdate.executeUpdate();
+        		prepareUpdate.getConnection().commit();
+            	prepareUpdate.close();
+
+    			
+    		}
+    		
 
 
     	}
     	//UpDateTable();
     	addTypes();
-    	prepareUpdate.close();
     	UpDateTable();
     	autoComplete();
     	JOptionPane.showMessageDialog(null, "Successfully deleted item: " + field1.getText());
@@ -637,6 +700,8 @@ public class InsertWindow {
             addRowsAndColumns(rsTest, dm);
 
             testTable.setModel(dm);
+            totalLabel.setText("Total number of items: " + testTable.getRowCount());
+
             refreshScreen();
             //conn.close();
         
@@ -670,7 +735,6 @@ public class InsertWindow {
             count++;
             dm.addRow(row);
         }
-        totalLabel.setText("Total number of items: " + count);
     }
     
     public void initPrepareStatment() throws SQLException
