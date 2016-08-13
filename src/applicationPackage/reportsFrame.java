@@ -256,7 +256,7 @@ public class reportsFrame {
 					// Specified Year
 					else if (!(resortName.getText().isEmpty()) && !(year.getText().isEmpty())
 							&& !(type.getSelectedItem().equals("All"))) {
-
+						System.out.println("this code fucks");
 						Association_By_Type_Name_And_Year(Name, Container, Year);
 
 					}
@@ -678,12 +678,8 @@ public class reportsFrame {
 			stmt = conn2.createStatement();
 			DefaultTableModel dm = new DefaultTableModel();
 			String testTable_String = ("SELECT *"
-					+ " From ResortManagement Where ResortManagement.AssociationName Like '" + category + "%' "
-					+ "AND ResortManagement.Year = " + year + ";"); // + "AND
-																	// Date_Acquired
-																	// LIKE '" +
-																	// year +
-																	// "%';'");
+					+ " From ResortManagement Where ResortManagement.AssociationName Like '" + category + "%' " +"And ResortManagement.StartYear <='" +year
+					+ "' AND ResortManagement.EndYear >='" + year  + "';"); 
 
 			PreparedStatement showTestTable = conn2.prepareStatement(testTable_String);
 			ResultSet rsTest = showTestTable.executeQuery();
@@ -707,17 +703,9 @@ public class reportsFrame {
 		try {
 			stmt = conn2.createStatement();
 			DefaultTableModel dm = new DefaultTableModel();
-			String testTable_String = ("Select AssociationName, Year, Type, Aisle, `Row`, `Column`, Depth, ID"
+			String testTable_String = ("SELECT *"
 					+ " From ResortManagement Where new_schema.ResortManagement.AssociationName Like '" + name + "%' "
-					+ "AND new_schema.ResortManagement.Type LIKE '" + type + "%';"); // +
-																						// "AND
-																						// Date_Acquired
-																						// LIKE
-																						// '"
-																						// +
-																						// year
-																						// +
-																						// "%';'");
+					+ "AND new_schema.ResortManagement.Type LIKE '" + type + "%';"); 
 
 			PreparedStatement showTestTable = conn2.prepareStatement(testTable_String);
 			ResultSet rsTest = showTestTable.executeQuery();
@@ -741,9 +729,10 @@ public class reportsFrame {
 		try {
 			stmt = conn2.createStatement();
 			DefaultTableModel dm = new DefaultTableModel();
-			String testTable_String = ("Select AssociationName, Year, Type, Aisle, `Row`, `Column`, Depth, ID"
+			String testTable_String = ("SELECT *"
 					+ " From ResortManagement Where ResortManagement.AssociationName Like '" + name + "%' "
-					+ "AND ResortManagement.Year = " + year + ";"); // + "AND
+					+"And ResortManagement.StartYear <='" +year
+					+ "' AND ResortManagement.EndYear >='" + year  + "';"); // + "AND
 																	// Date_Acquired
 																	// LIKE '" +
 																	// year +
@@ -770,7 +759,7 @@ public class reportsFrame {
 		try {
 			stmt = conn2.createStatement();
 			DefaultTableModel dm = new DefaultTableModel();
-			String testTable_String = ("Select AssociationName, Year, Type, Aisle, `Row`, `Column`, Depth, ID"
+			String testTable_String = ("SELECT *"
 					+ " From new_schema.ResortManagement Where new_schema.ResortManagement.AssociationName LIKE '"
 					+ name + "%';");
 
@@ -795,8 +784,9 @@ public class reportsFrame {
 		try {
 			stmt = conn2.createStatement();
 			DefaultTableModel dm = new DefaultTableModel();
-			String testTable_String = ("Select AssociationName, Year, Type, Aisle, `Row`, `Column`, Depth, ID"
-					+ " From ResortManagement Where ResortManagement.Year = " + year + ";");
+			String testTable_String = ("SELECT *"
+					+ " From ResortManagement Where ResortManagement.StartYear <='" +year
+					+ "' AND ResortManagement.EndYear >='" + year  + "';");
 
 			PreparedStatement showTestTable = conn2.prepareStatement(testTable_String);
 			ResultSet rsTest = showTestTable.executeQuery();
@@ -820,13 +810,9 @@ public class reportsFrame {
 		try {
 			stmt = conn2.createStatement();
 			DefaultTableModel dm = new DefaultTableModel();
-			String testTable_String = ("Select AssociationName, Year, Type, Aisle, `Row`, `Column`, Depth, ID"
-					+ " From ResortManagement Where ResortManagement.Type Like '" + type + "%' "
-					+ "AND ResortManagement.Year = " + year + ";"); // + "AND
-																	// Date_Acquired
-																	// LIKE '" +
-																	// year +
-																	// "%';'");
+			String testTable_String = ("SELECT *"
+					+ " From ResortManagement Where ResortManagement.Type Like '" + type + "%' " +"And ResortManagement.StartYear <='" +year
+					+ "' AND ResortManagement.EndYear >='" + year  + "';"); 
 
 			PreparedStatement showTestTable = conn2.prepareStatement(testTable_String);
 			ResultSet rsTest = showTestTable.executeQuery();
@@ -849,7 +835,7 @@ public class reportsFrame {
 		try {
 			stmt = conn2.createStatement();
 			DefaultTableModel dm = new DefaultTableModel();
-			String testTable_String = ("Select AssociationName, Year, Type, Aisle, `Row`, `Column`, Depth, ID"
+			String testTable_String = ("SELECT *"
 					+ " From new_schema.ResortManagement Where new_schema.ResortManagement.Type LIKE '" + type + "%';");
 
 			PreparedStatement showTestTable = conn2.prepareStatement(testTable_String);
@@ -867,17 +853,20 @@ public class reportsFrame {
 	}
 
 	// NEEDED BIG TIME
-	public static void Association_By_Type_Name_And_Year(String name, String type, int year) {
+	public static void Association_By_Type_Name_And_Year(String name, String type, int year) {  // DONE
 
 		java.sql.Statement stmt;
 
 		try {
 			stmt = conn2.createStatement();
 			DefaultTableModel dm = new DefaultTableModel();
-			String testTable_String = ("Select AssociationName, Year, Type, Aisle, `Row`, `Column`, Depth, ID"
+			String testTable_String = ("SELECT *"
 					+ " From ResortManagement Where ResortManagement.AssociationName Like '" + name + "%' "
-					+ "AND ResortManagement.Type Like '" + type + "%' " + "AND ResortManagement.Year = " + year + ";");
-
+					+ "AND ResortManagement.Type Like '" + type + "%' " +"And ResortManagement.StartYear <='" +year
+					+ "' AND ResortManagement.EndYear >='" + year  + "';");
+			
+			
+			
 			PreparedStatement showTestTable = conn2.prepareStatement(testTable_String);
 			ResultSet rsTest = showTestTable.executeQuery();
 
@@ -936,3 +925,7 @@ public class reportsFrame {
 	}
 
 } // end of ReportsFrame
+
+
+
+
