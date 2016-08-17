@@ -152,7 +152,7 @@ public class InsertWindow {
         updateBtn = new JButton("Update");
         insertBtn = new JButton("Insert");
         clearBtn = new JButton("Clear Fields");
-        excelBtn = new JButton("Excel");
+        excelBtn = new JButton("Export to Excel");
         deleteBtn = new JButton("Delete");
         springLayout.putConstraint(SpringLayout.WEST, deleteBtn, 70, SpringLayout.EAST, updateBtn);
         springLayout.putConstraint(SpringLayout.EAST, deleteBtn, -78, SpringLayout.WEST, scrollPane_1);
@@ -392,7 +392,7 @@ public class InsertWindow {
     	addTypes();
     	UpDateTable();
     	autoComplete();
-    	JOptionPane.showMessageDialog(null, "Successfully deleted item: " + field1.getText());
+    	//JOptionPane.showMessageDialog(null, "Successfully deleted item: " + field1.getText());
     	//conn.close();
     }
 //    private void updateItems() throws SQLException {
@@ -763,6 +763,8 @@ public class InsertWindow {
         testTable.getColumnModel().getColumn(5).setPreferredWidth(100);
         testTable.getColumnModel().getColumn(6).setPreferredWidth(100);
         testTable.getColumnModel().getColumn(7).setPreferredWidth(100);
+        testTable.getColumnModel().getColumn(8).setPreferredWidth(100);
+        testTable.getColumnModel().getColumn(9).setPreferredWidth(240);
 
     }
     
@@ -984,16 +986,17 @@ public class InsertWindow {
         springLayout.putConstraint(SpringLayout.EAST, updateBtn, 268, SpringLayout.WEST, frmInsertAsset.getContentPane());
         
         excelBtn.setFont(new Font("Segoe UI Semilight", Font.PLAIN, 22));
-        //frmInsertAsset.getContentPane().add(excelBtn);
-        springLayout.putConstraint(SpringLayout.WEST, clearBtn, 125, SpringLayout.WEST, frmInsertAsset.getContentPane());
+        frmInsertAsset.getContentPane().add(excelBtn);
+        springLayout.putConstraint(SpringLayout.WEST, clearBtn, 30, SpringLayout.WEST, frmInsertAsset.getContentPane());
         springLayout.putConstraint(SpringLayout.SOUTH, clearBtn, 16, SpringLayout.SOUTH, scrollPane_1);
-        springLayout.putConstraint(SpringLayout.EAST, clearBtn, -199, SpringLayout.WEST, scrollPane_1);
+        springLayout.putConstraint(SpringLayout.EAST, clearBtn, -409, SpringLayout.WEST, scrollPane_1);
         
-        springLayout.putConstraint(SpringLayout.NORTH, clearBtn, 17, SpringLayout.SOUTH, insertBtn);
+        springLayout.putConstraint(SpringLayout.NORTH, clearBtn, 30, SpringLayout.SOUTH, insertBtn);
         
-        springLayout.putConstraint(SpringLayout.NORTH, excelBtn, 3, SpringLayout.NORTH, clearBtn);
-        springLayout.putConstraint(SpringLayout.WEST, excelBtn, 76, SpringLayout.EAST, clearBtn);
-        springLayout.putConstraint(SpringLayout.EAST, excelBtn, -175, SpringLayout.WEST, scrollPane_1);
+        springLayout.putConstraint(SpringLayout.NORTH, excelBtn, 30, SpringLayout.SOUTH, insertBtn);
+        springLayout.putConstraint(SpringLayout.WEST, excelBtn, 70, SpringLayout.EAST, clearBtn);
+        springLayout.putConstraint(SpringLayout.EAST, excelBtn, -78, SpringLayout.WEST, scrollPane_1);
+        springLayout.putConstraint(SpringLayout.SOUTH, excelBtn, 16, SpringLayout.SOUTH, scrollPane_1);
         springLayout.putConstraint(SpringLayout.NORTH, deleteBtn, 0, SpringLayout.NORTH, insertBtn);
         deleteBtn.setFont(new Font("Segoe UI Semilight", Font.PLAIN, 22));
         frmInsertAsset.getContentPane().add(deleteBtn);
