@@ -315,11 +315,11 @@ public class InsertWindow {
     			getId = "'" + String.valueOf(testTable.getModel().getValueAt(selection[i], 8)) + "'";
     			IDs.add(getId);
     			//gets aisle,row, colum,depth
-    			aisleArray[i] = (int) testTable.getModel().getValueAt(selection[i], 4);
+    			//aisleArray[i] = (int) testTable.getModel().getValueAt(selection[i], 4);
     			//System.out.println(aisleArray[i] );
-    			rowArray[i] =  (int) testTable.getModel().getValueAt(selection[i], 5);
-    			columnArray[i] = (int) testTable.getModel().getValueAt(selection[i], 6);
-    			depthArray[i] = (String) testTable.getModel().getValueAt(selection[i], 7);
+    			//rowArray[i] =  (int) testTable.getModel().getValueAt(selection[i], 5);
+    			//columnArray[i] = (int) testTable.getModel().getValueAt(selection[i], 6);
+    			//depthArray[i] = (String) testTable.getModel().getValueAt(selection[i], 7);
 
     			if(i==selection.length-1){
     				maxID = selection[i];
@@ -768,7 +768,8 @@ public class InsertWindow {
         testTable.getColumnModel().getColumn(5).setPreferredWidth(100);
         testTable.getColumnModel().getColumn(6).setPreferredWidth(100);
         testTable.getColumnModel().getColumn(7).setPreferredWidth(100);
-
+        testTable.getColumnModel().getColumn(8).setPreferredWidth(100);
+        testTable.getColumnModel().getColumn(9).setPreferredWidth(240);
     }
     
     private void addTextBoxFields()
