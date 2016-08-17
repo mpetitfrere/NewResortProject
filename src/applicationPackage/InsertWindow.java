@@ -40,6 +40,7 @@ import javax.swing.JTable;
 import javax.swing.JTextField;
 import javax.swing.ScrollPaneConstants;
 import javax.swing.SpringLayout;
+import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
 import javax.swing.UnsupportedLookAndFeelException;
 import javax.swing.border.EmptyBorder;
@@ -57,6 +58,8 @@ import com.mxrck.autocompleter.TextAutoCompleter;
 import applicationPackage.ExcelFrame;
 
 import java.awt.event.ActionListener;
+import java.awt.event.FocusAdapter;
+import java.awt.event.FocusEvent;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 import java.awt.event.KeyAdapter;
@@ -430,7 +433,16 @@ public class InsertWindow {
 //    }
 
     private void getInputFromFields() throws NumberFormatException, SQLException {
-        
+        field1.addFocusListener(new FocusAdapter(){
+        	public void focusGained(FocusEvent e) {
+        		SwingUtilities.invokeLater(new Runnable(){
+        			@Override
+        			public void run() {
+        				field1.selectAll();
+        			}
+        		});
+        	}
+        });
         field1.addKeyListener(new KeyAdapter() {
             public void keyReleased(KeyEvent e) {
                 try {
@@ -468,7 +480,16 @@ public class InsertWindow {
 				
 			}});
         
-        
+        field2a.addFocusListener(new FocusAdapter(){
+        	public void focusGained(FocusEvent e) {
+        		SwingUtilities.invokeLater(new Runnable(){
+        			@Override
+        			public void run() {
+        				field2a.selectAll();
+        			}
+        		});
+        	}
+        });
         field2a.addKeyListener(new KeyAdapter() {
             public void keyReleased(KeyEvent e) {
                 try {
@@ -479,6 +500,17 @@ public class InsertWindow {
                     e1.printStackTrace();
                 }
             }
+        });
+        
+        field2b.addFocusListener(new FocusAdapter(){
+        	public void focusGained(FocusEvent e) {
+        		SwingUtilities.invokeLater(new Runnable(){
+        			@Override
+        			public void run() {
+        				field2b.selectAll();
+        			}
+        		});
+        	}
         });
         
         field2b.addKeyListener(new KeyAdapter() {
@@ -609,6 +641,16 @@ public class InsertWindow {
 
     private void field3ItemListener()
     {
+    	field3.addFocusListener(new FocusAdapter(){
+        	public void focusGained(FocusEvent e) {
+        		SwingUtilities.invokeLater(new Runnable(){
+        			@Override
+        			public void run() {
+        				field3.getSelectedItem();
+        			}
+        		});
+        	}
+        });
         field3.addItemListener(new ItemListener() {
             public void itemStateChanged(ItemEvent e) {
                 //after combobox is inserted with "", it will enable user to edit field
@@ -1118,10 +1160,10 @@ public class InsertWindow {
         field2a.setText("");
         field2b.setText("");
         field3.setSelectedIndex(0);
-        field4.setText("");
+        /*field4.setText("");
         field5.setText("");
         field6.setText("");
-        field7.setSelectedIndex(0);
+        field7.setSelectedIndex(0);*/
     }
     private boolean validateFields()
     {
