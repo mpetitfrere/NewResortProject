@@ -30,7 +30,7 @@ public class MySQLConnection {
 	public static Connection dbConnector(){
 		try{
 			Class.forName("com.mysql.jdbc.Driver");
-			String url ="jdbc:mysql://104.154.114.159/new_schema?zeroDateTimeBehavior=convertToNull";
+			String url ="jdbc:mysql://104.154.114.159/new_schema";
 			String userName = "root";
 			String password = "resort";
 			Connection conn= DriverManager.getConnection(url, userName, password);
