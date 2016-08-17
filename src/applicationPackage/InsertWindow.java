@@ -14,6 +14,7 @@ import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
+import java.io.IOException;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -201,13 +202,12 @@ public class InsertWindow {
                 clearFields();
             }
         });
-        /*excelBtn.addActionListener(new ActionListener() {
+        excelBtn.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                ExcelFrame frame = new ExcelFrame();
-                frmInsertAsset.setVisible(false);
-                frame.setVisible(true);
+               ConvertExcel ce = new ConvertExcel();
+               
             }
-        });*/
+        });
         insertBtn.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 insertToDB();
@@ -276,26 +276,14 @@ public class InsertWindow {
     	String defaultField2a = null;
     	String defaultField2b = null;
     	String defaultField3 = null;
-    	//delete
-    	int length = selection.length;
-    	int maxID;
-    	int [] aisleArray = null;
-    	int [] rowArray = null;
-    	int [] columnArray = null;
-    	String [] depthArray = null;
-    
+
     	if(key.equals("delete"))
     	{
     		defaultField1 = "********";
     		defaultField2a = "0000";
     		defaultField2b = "0000";
     		defaultField3 = "";
-    		
-    		
-    		aisleArray = new int[length];
-        	rowArray =  new int[length];
-        	columnArray =  new int[length];
-        	depthArray =  new String[length];
+
     	}
     	else
     	{
@@ -317,7 +305,6 @@ public class InsertWindow {
     			//gets aisle,row, colum,depth
 
     			if(i==selection.length-1){
-    				maxID = selection[i];
     			} else{
     				IDs.add(", ");
     			}
@@ -330,62 +317,17 @@ public class InsertWindow {
     			//sb.append(", ");
     		}
 
-    		//System.out.println(sb.toString());
-    		
+    		updateFieldsSQL = "UPDATE `new_schema`.`ResortManagement` SET `AssociationName`='" + defaultField1 +"', "
+    				+ "`StartYear`='" + defaultField2a + "', "
+    				+ "`EndYear`='" + defaultField2b + "', "
+    				+ "`Type`='" + defaultField3 + "' "
+    				+ " WHERE `ID` IN (" + sb.toString() + ")";
+    		System.out.println(updateFieldsSQL);
 
-    		if(key == "delete")
-    		{
-    			updateFieldsSQL = "DELETE FROM `new_schema`.`ResortManagement` "
-        				+ " WHERE `ID` IN (" + sb.toString() + ")";
-        		//System.out.println(updateFieldsSQL);
-        		
-        		prepareUpdate = conn.prepareStatement(updateFieldsSQL);
-        		prepareUpdate.executeUpdate();
-        		prepareUpdate.getConnection().commit();
-
-        		String query = "INSERT into `new_schema`.`ResortManagement` (`AssociationName`, `StartYear`, `EndYear`, `Type`, `Aisle`, `Row`, `Column`, `Depth`) "
-        	                + "values (?,?,?,?,"
-        	                + "?,?,?,?)";
-        		prepareUpdate = conn.prepareStatement(query);
-
-        		for(int i=0;i<length;i++)
-        		{
-        			
-        			prepareUpdate.setString(1, defaultField1);
-        			prepareUpdate.setInt(2, Integer.parseInt(defaultField2a));
-        			prepareUpdate.setInt(3, Integer.parseInt(defaultField2b));
-        			prepareUpdate.setString(4, defaultField3);
-        			
-        			prepareUpdate.setInt(5, aisleArray[i]);
-        			prepareUpdate.setInt(6, rowArray[i]);
-        			prepareUpdate.setInt(7, columnArray[i]);
-        			prepareUpdate.setString(8, depthArray[i]);
-        			prepareUpdate.addBatch();
-
-        		}
-        		prepareUpdate.executeBatch();
-        		//prepareUpdate.getConnection().commit();
-            	prepareUpdate.close();
-
-    		}
-    		else
-    		{
-    			updateFieldsSQL = "UPDATE `new_schema`.`ResortManagement` SET `AssociationName`='" + defaultField1 +"', "
-        				+ "`StartYear`='" + defaultField2a + "', "
-        				+ "`EndYear`='" + defaultField2b + "', "
-        				+ "`Type`='" + defaultField3 + "' "
-        				+ " WHERE `ID` IN (" + sb.toString() + ")";
-        		System.out.println(updateFieldsSQL);
-        		
-        		prepareUpdate = conn.prepareStatement(updateFieldsSQL);
-        		prepareUpdate.executeUpdate();
-        		prepareUpdate.getConnection().commit();
-            	prepareUpdate.close();
-
-    			
-    		}
-    		
-
+    		prepareUpdate = conn.prepareStatement(updateFieldsSQL);
+    		prepareUpdate.executeUpdate();
+    		prepareUpdate.getConnection().commit();
+    		prepareUpdate.close();
 
     	}
     	//UpDateTable();
@@ -1118,10 +1060,6 @@ public class InsertWindow {
         field2a.setText("");
         field2b.setText("");
         field3.setSelectedIndex(0);
-        field4.setText("");
-        field5.setText("");
-        field6.setText("");
-        field7.setSelectedIndex(0);
     }
     private boolean validateFields()
     {
