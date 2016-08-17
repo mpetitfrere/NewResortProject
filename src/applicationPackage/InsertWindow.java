@@ -6,10 +6,12 @@ import java.awt.Dimension;
 import java.awt.EventQueue;
 import java.awt.Font;
 import java.awt.GridLayout;
+import java.awt.List;
 import java.awt.Toolkit;
 import java.awt.Window;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.sql.Connection;
@@ -17,6 +19,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
+import java.sql.Statement;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -40,12 +43,16 @@ import javax.swing.SpringLayout;
 import javax.swing.UIManager;
 import javax.swing.UnsupportedLookAndFeelException;
 import javax.swing.border.EmptyBorder;
+import javax.swing.event.DocumentEvent;
+import javax.swing.event.DocumentListener;
 import javax.swing.plaf.FontUIResource;
 import javax.swing.table.AbstractTableModel;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableModel;
 import javax.swing.text.DefaultFormatterFactory;
 import javax.swing.text.MaskFormatter;
+
+import com.mxrck.autocompleter.TextAutoCompleter;
 
 import applicationPackage.ExcelFrame;
 
@@ -61,6 +68,7 @@ import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableModel;
 
 public class InsertWindow {
+
     
     private static JTable testTable;
     //init Frame and springLayout
@@ -74,16 +82,20 @@ public class InsertWindow {
     private String numSwap;
     private String autoIDString;
     private String deleteItemString;
- 
+    private TextAutoCompleter complete;
+    int[] selection;
 
     // instantiating textfields for each jlabel
     private JTextField field1 = new JTextField();
-    private JTextField field2 = new JTextField();
+    private JTextField field2a = new JTextField();
+    private JTextField field2b = new JTextField();
+
     private JComboBox field3 = new JComboBox();
     private JTextField field4 = new JTextField();
     private JTextField field5 = new JTextField();
     private JTextField field6 = new JTextField();    
     private JComboBox field7 = new JComboBox();
+
     private JButton updateBtn;
     private JButton clearBtn;
     private JButton excelBtn;
@@ -129,7 +141,12 @@ public class InsertWindow {
      * @wbp.parser.entryPoint
      */
     private void initialize() throws SQLException {
+    	
+    	field1.setFont(new Font("Arial", Font.BOLD, 14));
+    	//init objects
     	conn= MySQLConnection.dbConnector();
+	    complete=new TextAutoCompleter(field1);
+
         //Components
         JScrollPane scrollPane_1 = new JScrollPane();
         updateBtn = new JButton("Update");
@@ -137,10 +154,12 @@ public class InsertWindow {
         clearBtn = new JButton("Clear Fields");
         excelBtn = new JButton("Excel");
         deleteBtn = new JButton("Delete");
+        springLayout.putConstraint(SpringLayout.WEST, deleteBtn, 70, SpringLayout.EAST, updateBtn);
+        springLayout.putConstraint(SpringLayout.EAST, deleteBtn, -78, SpringLayout.WEST, scrollPane_1);
 
         //Setting up Gui's frame and components
         setupFrame();
-        setUpFrameComponents(scrollPane_1, insertBtn, updateBtn, clearBtn);
+        setUpFrameComponents(scrollPane_1,  updateBtn, clearBtn);
         gridLayoutSetup();
         setupTable(scrollPane_1);
         initPrepareStatment();
@@ -149,7 +168,7 @@ public class InsertWindow {
         getTypes();
         getInputFromFields();
         actionPerformedBtn();
-        
+        autoComplete();
 
         frmInsertAsset.addWindowListener(new WindowAdapter()
             {
@@ -168,7 +187,9 @@ public class InsertWindow {
         updateBtn.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 try {
-                    updateItems();
+                	String var = "update";
+                    updateItems(var);
+                    
                 } catch (SQLException e1) {
                     // TODO Auto-generated catch block
                     e1.printStackTrace();
@@ -193,109 +214,225 @@ public class InsertWindow {
                 
             }
             private void insertToDB() {
-                if(!isFieldsEmpty() && validateFields())
-                {
-                    try {
-                        prepare.executeUpdate();
-                        prepare.getConnection().commit();
-                        prepare.close();
-                        initPrepareStatment();
-                        clearFields();
-                        UpDateTable();
-                        addTypes();
-                        setPrepareField7();
-                        JOptionPane.showMessageDialog(null, "Successfully inserted into database.", "Success" , JOptionPane.INFORMATION_MESSAGE);
+            	if(!isFieldsEmpty() && validateFields())
+            	{
+            		try {
+            			insertMethodCalls();
+            			JOptionPane.showMessageDialog(null, "Successfully inserted into database.", "Success" , JOptionPane.INFORMATION_MESSAGE);
 
-                    } catch (SQLException e) {
-                        // Check Duplicate Entry on index LOCATION
-                        if(e.getMessage().contains("key 'LOCATION'"))
-                        {
-                            JOptionPane.showMessageDialog(null, "There is already an item  at \nAisle :" + field4.getText() + "\nRow: " + field5.getText()
-                            + "\nColumn: " + field6.getText() + "\nDepth: " + field7.getSelectedItem().toString() 
-                            + "\nPlease change the location and insert again or if you wish to use this location \nplease delete or change the location of existing item \nin this location first, then try again."
-                            , "Error", JOptionPane.ERROR_MESSAGE);
-                            try {
-                                prepare.close();
-                                initPrepareStatment();
-                                getPrepareValues();
-                            } catch (SQLException e1) {
-                                // TODO Auto-generated catch block
-                                //e1.printStackTrace();
-                            }    
-                        }
-                        else if(e.getMessage().contains("Communications link failure"))
-                        {
-                            JOptionPane.showMessageDialog(null, "Internet connection was lost. Please try again.");
-                            try {
-                                prepare.close();
-                                initPrepareStatment();
-                                getPrepareValues();
-                            } catch (SQLException e1) {
-                                // TODO Auto-generated catch block
-                                e1.printStackTrace();
-                            }
+            		} catch (SQLException e) {
+            			// Check Duplicate Entry on index LOCATION
+            			if(e.getMessage().contains("key 'LOCATION'"))
+            			{
+            				JOptionPane.showMessageDialog(null, "There is already an item  at \nAisle :" + field4.getText() + "\nRow: " + field5.getText()
+            				+ "\nColumn: " + field6.getText() + "\nDepth: " + field7.getSelectedItem().toString() 
+            				+ "\nPlease change the location and insert again or if you wish to use this location \nplease delete or change the location of existing item \nin this location first, then try again."
+            				, "Error", JOptionPane.ERROR_MESSAGE);
+            				try {
+            					prepare.close();
+            					initPrepareStatment();
+            					getPrepareValues();
+            				} catch (SQLException e1) {
+            					// TODO Auto-generated catch block
+            					//e1.printStackTrace();
+            				}    
+            			}
+            			else if(e.getMessage().contains("Communications link failure"))
+            			{
+            				JOptionPane.showMessageDialog(null, "Internet connection was lost. Please try again.");
+            				try {
+            					prepare.close();
+            					initPrepareStatment();
+            					getPrepareValues();
+            				} catch (SQLException e1) {
+            					// TODO Auto-generated catch block
+            					e1.printStackTrace();
+            				}
 
-                        }
-                    }    
-                }
+            			}
+            		}    
+            	}
             }
         });
         deleteBtn.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 try {
-                    deleteItem();
+                	String var = "delete";
+                    updateItems(var);
                 } catch (SQLException e1) {
                     // TODO Auto-generated catch block
                     e1.printStackTrace();
                 }        
             }
 
-            private void deleteItem() throws SQLException {
-            
-                PreparedStatement prepareDel = conn.prepareStatement(deleteItemString);
-                prepareDel.executeUpdate();
-                UpDateTable();
-                JOptionPane.showMessageDialog(null, "Successfully deleted item: " + field1.getText());
-                prepareDel.close();
-                //conn.close();
-            }
+         
         });
         
     }
     
-    private void updateItems() throws SQLException {
-        int ID = 0;
-        
-        PreparedStatement prepareID = conn.prepareStatement(autoIDString);
-        ResultSet resultsetID = prepareID.executeQuery();
-        if(resultsetID.next() && resultsetID.getInt(1) > 0 )
-        {
-            //System.out.println(resultsetID.getInt(1));
-            ID = resultsetID.getInt(1);
-            prepareID.close();
-            resultsetID.close();
-        }
-        else{
-            prepareID.close();
-            resultsetID.close();
-        }
-    
-        String updateFieldsSQL = "UPDATE `new_schema`.`ResortManagement` SET `AssociationName`='" + field1.getText() +"', "
-                + "`Year`='" + field2.getText() + "', `Type`='" + field3.getSelectedItem().toString() + "', "
-                + "`Aisle`='" + field4.getText() + "', `Row`='" + field5.getText() + "', `Column`='" + field6.getText() 
-                + "', `Depth`='" + field7.getSelectedItem().toString() + "' "
-                + "WHERE `ID`='" + String.valueOf(ID)+ "'";
-        PreparedStatement prepareUpdate = conn.prepareStatement(updateFieldsSQL);
-        prepareUpdate.executeUpdate();
-        //System.out.println(ID);
-        UpDateTable();
-        clearFields();
-        prepareUpdate.close();
-        //conn.close();
-        JOptionPane.showMessageDialog(null, "Successfully updated item.", "Update" , JOptionPane.INFORMATION_MESSAGE);
+    private void updateItems(String key) throws SQLException {
 
-        
+    	String defaultField1 = null;
+    	String defaultField2a = null;
+    	String defaultField2b = null;
+    	String defaultField3 = null;
+    	//delete
+    	int length = selection.length;
+    	int maxID;
+    	int [] aisleArray = null;
+    	int [] rowArray = null;
+    	int [] columnArray = null;
+    	String [] depthArray = null;
+    
+    	if(key.equals("delete"))
+    	{
+    		defaultField1 = "********";
+    		defaultField2a = "0000";
+    		defaultField2b = "0000";
+    		defaultField3 = "";
+    		
+    		
+    		aisleArray = new int[length];
+        	rowArray =  new int[length];
+        	columnArray =  new int[length];
+        	depthArray =  new String[length];
+    	}
+    	else
+    	{
+    		defaultField1 = field1.getText();
+    		defaultField2a = field2a.getText();
+    		defaultField2b = field2b.getText();
+    		defaultField3 =  field3.getSelectedItem().toString();
+    	}
+    	String updateFieldsSQL;
+    	String getId = "";
+    	PreparedStatement prepareUpdate = null;
+    	ArrayList<String> IDs = new ArrayList<String>();
+
+    	if(selection != null)
+    	{
+    		for(int i=0; i<selection.length; i++){
+    			getId = "'" + String.valueOf(testTable.getModel().getValueAt(selection[i], 8)) + "'";
+    			IDs.add(getId);
+    			//gets aisle,row, colum,depth
+    			aisleArray[i] = (int) testTable.getModel().getValueAt(selection[i], 4);
+    			//System.out.println(aisleArray[i] );
+    			rowArray[i] =  (int) testTable.getModel().getValueAt(selection[i], 5);
+    			columnArray[i] = (int) testTable.getModel().getValueAt(selection[i], 6);
+    			depthArray[i] = (String) testTable.getModel().getValueAt(selection[i], 7);
+
+    			if(i==selection.length-1){
+    				maxID = selection[i];
+    			} else{
+    				IDs.add(", ");
+    			}
+
+    		}
+    		StringBuilder sb = new StringBuilder();
+    		for (String s : IDs)
+    		{
+    			sb.append(s);
+    			//sb.append(", ");
+    		}
+
+    		//System.out.println(sb.toString());
+    		
+
+    		if(key == "delete")
+    		{
+    			updateFieldsSQL = "DELETE FROM `new_schema`.`ResortManagement` "
+        				+ " WHERE `ID` IN (" + sb.toString() + ")";
+        		//System.out.println(updateFieldsSQL);
+        		
+        		prepareUpdate = conn.prepareStatement(updateFieldsSQL);
+        		prepareUpdate.executeUpdate();
+        		prepareUpdate.getConnection().commit();
+
+        		String query = "INSERT into `new_schema`.`ResortManagement` (`AssociationName`, `StartYear`, `EndYear`, `Type`, `Aisle`, `Row`, `Column`, `Depth`) "
+        	                + "values (?,?,?,?,"
+        	                + "?,?,?,?)";
+        		prepareUpdate = conn.prepareStatement(query);
+
+        		for(int i=0;i<length;i++)
+        		{
+        			
+        			prepareUpdate.setString(1, defaultField1);
+        			prepareUpdate.setInt(2, Integer.parseInt(defaultField2a));
+        			prepareUpdate.setInt(3, Integer.parseInt(defaultField2b));
+        			prepareUpdate.setString(4, defaultField3);
+        			
+        			prepareUpdate.setInt(5, aisleArray[i]);
+        			prepareUpdate.setInt(6, rowArray[i]);
+        			prepareUpdate.setInt(7, columnArray[i]);
+        			prepareUpdate.setString(8, depthArray[i]);
+        			prepareUpdate.addBatch();
+
+        		}
+        		prepareUpdate.executeBatch();
+        		//prepareUpdate.getConnection().commit();
+            	prepareUpdate.close();
+
+    		}
+    		else
+    		{
+    			updateFieldsSQL = "UPDATE `new_schema`.`ResortManagement` SET `AssociationName`='" + defaultField1 +"', "
+        				+ "`StartYear`='" + defaultField2a + "', "
+        				+ "`EndYear`='" + defaultField2b + "', "
+        				+ "`Type`='" + defaultField3 + "' "
+        				+ " WHERE `ID` IN (" + sb.toString() + ")";
+        		//System.out.println(updateFieldsSQL);
+        		
+        		prepareUpdate = conn.prepareStatement(updateFieldsSQL);
+        		prepareUpdate.executeUpdate();
+        		prepareUpdate.getConnection().commit();
+            	prepareUpdate.close();
+
+    			
+    		}
+    		
+
+
+    	}
+    	//UpDateTable();
+    	addTypes();
+    	UpDateTable();
+    	autoComplete();
+    	JOptionPane.showMessageDialog(null, "Successfully deleted item: " + field1.getText());
+    	//conn.close();
     }
+//    private void updateItems() throws SQLException {
+//        int ID = 0;
+//        
+//        PreparedStatement prepareID = conn.prepareStatement(autoIDString);
+//
+//
+//        String defaultField1 = "EMPTY";
+//        String defaultField2 = "0000";
+//        String defaultField3 = "EMPTY";
+//        PreparedStatement prepareUpdate;
+//        
+//        String updateFieldsSQL = "UPDATE `new_schema`.`ResortManagement` SET `AssociationName`='" + field1.getText() +"', "
+//				+ "`StartYear`='" + field2a.getText()  + "', "
+//				+ "`EndYear`='" + field2b.getText()  + "', "
+//			    + "`Type`='" + field3.getSelectedItem().toString()   + "', "
+//				+ "`Aisle`='" + field4.getText() + "', "
+//				+ "`Row`='" + field5.getText() + "', "
+//				+ "`Column`='" + field6.getText() + "', "
+//				+ "`Depth`='" + field7.getSelectedItem().toString() + "' "
+//				+ " WHERE `ID`='" + String.valueOf(testTable.getModel().getValueAt(selection[0], 8)) + "'";
+//       prepareUpdate = conn.prepareStatement(updateFieldsSQL);
+//        prepareUpdate.executeUpdate();
+//        prepareUpdate.getConnection().commit();
+//        System.out.println(updateFieldsSQL);
+//        UpDateTable();
+//        clearFields();
+//        prepareUpdate.close();
+//        autoComplete();
+//        //conn.close();
+//        JOptionPane.showMessageDialog(null, "Successfully updated item.", "Update" , JOptionPane.INFORMATION_MESSAGE);
+//
+//        
+//    }
 
     private void getInputFromFields() throws NumberFormatException, SQLException {
         
@@ -303,6 +440,8 @@ public class InsertWindow {
             public void keyReleased(KeyEvent e) {
                 try {
                     prepare.setString(Integer.parseInt(field1.getName()), field1.getText());
+                    System.out.println("DoctorV: " + field1.getText());
+
                 } catch (NumberFormatException | SQLException e1) {
                     // TODO Auto-generated catch block
                     e1.printStackTrace();
@@ -310,10 +449,47 @@ public class InsertWindow {
             }
         });
         
-        field2.addKeyListener(new KeyAdapter() {
+        //gets value from autocomplete selection
+        field1.getDocument().addDocumentListener(new DocumentListener(){
+        	@Override
+        	public void changedUpdate(DocumentEvent e) {
+               
+        	}
+
+			@Override
+			public void insertUpdate(DocumentEvent e) {
+				 try {
+						prepare.setString(Integer.parseInt(field1.getName()), field1.getText());
+	                    System.out.println("DoctorO: " + field1.getText());
+
+					} catch (NumberFormatException | SQLException e1) {
+						// TODO Auto-generated catch block
+						e1.printStackTrace();
+					}}
+
+			@Override
+			public void removeUpdate(DocumentEvent e) {
+				// TODO Auto-generated method stub
+				
+			}});
+        
+        
+        field2a.addKeyListener(new KeyAdapter() {
             public void keyReleased(KeyEvent e) {
                 try {
-                    getIntegerInput(field2, e);
+                    getIntegerInput(field2a, e);
+                
+                } catch (NumberFormatException e1) {
+                    // TODO Auto-generated catch block
+                    e1.printStackTrace();
+                }
+            }
+        });
+        
+        field2b.addKeyListener(new KeyAdapter() {
+            public void keyReleased(KeyEvent e) {
+                try {
+                    getIntegerInput(field2b, e);
                 
                 } catch (NumberFormatException e1) {
                     // TODO Auto-generated catch block
@@ -385,7 +561,6 @@ public class InsertWindow {
         String temp = jText.getText();
         //only accepts positives doubles
         
-    
         String regex = "(?<![-.])\\b[0-9]+\\b(?!\\.[0-9])";
     
         //    (?<![-.])   # Assert that the previous character isn't a minus sign or a dot.
@@ -416,9 +591,8 @@ public class InsertWindow {
         }
     }
 
-    
-    
-    private void getTypes() throws SQLException {
+    private void getTypes() throws SQLException 
+    {
         //field3
         prepare.setString(3, field3.getSelectedItem().toString());
 
@@ -511,7 +685,7 @@ public class InsertWindow {
                 @Override
                 public Class getColumnClass(int c) {
                     //System.out.println(getValueAt(0, c).getClass().toString());
-                    if(c == 1 || c==3 || c==4 || c==5  )
+                    if(c == 1 || c==4 || c==5 || c==6  )
                     {
                         return Integer.class;
                     }
@@ -520,12 +694,14 @@ public class InsertWindow {
                 }
             };
             //query and resultset
-            String testTable_String = "Select AssociationName, Year, Type, Aisle, `Row`, `Column`, Depth from ResortManagement";
+            String testTable_String = "Select * from ResortManagement";
             PreparedStatement showTestTable = conn.prepareStatement(testTable_String);
             ResultSet rsTest = showTestTable.executeQuery();
             addRowsAndColumns(rsTest, dm);
 
             testTable.setModel(dm);
+            totalLabel.setText("Total number of items: " + testTable.getRowCount());
+
             refreshScreen();
             //conn.close();
         
@@ -549,7 +725,7 @@ public class InsertWindow {
         int count = 0;
         while(rs.next()){
             for(int i=0;i<cols;i++){
-                if(i == 1 || i==3 || i==4 || i==5)
+                if(i == 1 || i==4 || i==5 || i==6)
                 {
                     row[i]=Integer.parseInt(rs.getString(i+1));
                 }
@@ -559,7 +735,6 @@ public class InsertWindow {
             count++;
             dm.addRow(row);
         }
-        totalLabel.setText("Total number of items: " + count);
     }
     
     public void initPrepareStatment() throws SQLException
@@ -571,8 +746,8 @@ public class InsertWindow {
             // TODO Auto-generated catch block
             e.printStackTrace();
         }
-        String query = "INSERT into `new_schema`.`ResortManagement` (`AssociationName`, `Year`, `Type`, `Aisle`, `Row`, `Column`, `Depth`) "
-                + "values (?,?,?,?,?,?,?)";
+        String query = "INSERT into `new_schema`.`ResortManagement` (`AssociationName`, `StartYear`, `EndYear`, `Type`, `Aisle`, `Row`, `Column`, `Depth`) "
+                + "values (?,?,?,?,?,?,?,?)";
          
         prepare = conn.prepareStatement(query);
     }
@@ -592,18 +767,22 @@ public class InsertWindow {
         testTable.getColumnModel().getColumn(4).setPreferredWidth(100);
         testTable.getColumnModel().getColumn(5).setPreferredWidth(100);
         testTable.getColumnModel().getColumn(6).setPreferredWidth(100);
+        testTable.getColumnModel().getColumn(7).setPreferredWidth(100);
+
     }
     
     private void addTextBoxFields()
     {
         Object[] fields = {
                 "Association Name:    ", field1,
-                "Year:    ", field2,
+                "Start Year:    ", field2a,
+                "End Year:      ", field2b,
                 "Type:    ", field3,
                 "Aisle:    ", field4,
                 "Row:    ", field5,
                 "Column:    ", field6,
                 "Depth:    ", field7
+                
         };
         int i=0;
         while (i < fields.length) {
@@ -612,6 +791,19 @@ public class InsertWindow {
             g1_Jpanel.add(label);
             g1_Jpanel.add((Component) fields[i++]);
         }
+	    
+        field4.setEnabled(false);
+        field5.setEnabled(false);
+        field6.setEnabled(false);
+        field7.setEnabled(false);
+        
+        field4.setDisabledTextColor(Color.BLACK);
+        field5.setDisabledTextColor(Color.BLACK);
+        field6.setDisabledTextColor(Color.BLACK);
+       
+
+
+
         field7.addItem("B");
         field7.addItem("F");
         setTextFieldName();
@@ -623,7 +815,8 @@ public class InsertWindow {
         //Global Variables
         autoIDString = "SELECT  ID FROM new_schema.ResortManagement "
                 + "WHERE `AssociationName` LIKE '" + field1.getText() +"%' "
-                + "AND `Year` LIKE '" + field2.getText() +"%' "
+                + "AND `StartYear` LIKE '" + field2a.getText() +"%' "
+                + "AND `EndYear` LIKE '" + field2b.getText() +"%' "
                 + "AND `Type` LIKE '" + field3.getSelectedItem().toString() +"%'"
                 + "AND `Aisle` LIKE '" + field4.getText() +"%' "
                 + "AND `Row`   LIKE '" + field5.getText() +"%' "
@@ -635,11 +828,13 @@ public class InsertWindow {
     private void setupTable(JScrollPane scrollPane_1) {
         
     	//Set JTable editable to false  
+
 		DefaultTableModel model = new DefaultTableModel();
 		testTable = new JTable(model) {
 			public boolean isCellEditable(int rowIndex, int colIndex) {
 				return false; // Disallow the editing of any cell
 			}
+
 		}; //end set JTable to false
         
         UpDateTable();
@@ -664,9 +859,12 @@ public class InsertWindow {
             //    // the textboxes
             @Override
             public void mouseReleased(java.awt.event.MouseEvent evt) {
+            	//Grabs the indices form table
+                selection = testTable.getSelectedRows();
+                             
                 int row = testTable.getSelectedRow();    
                 //Gets text from row and fills jtext if cell is not empty
-                
+
                 if(testTable.getValueAt(row, 0) != null)
                 {
                     field1.setText(testTable.getValueAt(row, 0).toString());
@@ -675,37 +873,44 @@ public class InsertWindow {
                     field1.setText("");
                 if(testTable.getValueAt(row, 1) != null)
                 {
-                    field2.setText(testTable.getValueAt(row, 1).toString());
+                    field2a.setText(testTable.getValueAt(row, 1).toString());
                 }
                 else
-                    field2.setText("");
+                    field2a.setText("");
+                if(testTable.getValueAt(row, 1) != null)
+                {
+                    field2b.setText(testTable.getValueAt(row, 2).toString());
+                }
+                else
+                    field2b.setText("");
+                
                 if(testTable.getValueAt(row, 2) != null)
                 {
-                    field3.setSelectedItem(testTable.getValueAt(row, 2).toString());
+                    field3.setSelectedItem(testTable.getValueAt(row, 3).toString());
                 }
                 else
                     field3.setSelectedIndex(0);
                 if(testTable.getValueAt(row, 3) != null)
                 {
-                    field4.setText(testTable.getValueAt(row, 3).toString());
+                    field4.setText(testTable.getValueAt(row, 4).toString());
                 }
                 else
                     field4.setText("");
                 if(testTable.getValueAt(row, 4) != null)
                 {
-                    field5.setText(testTable.getValueAt(row, 4).toString());
+                    field5.setText(testTable.getValueAt(row, 5).toString());
                 }
                 else
                     field5.setText("");
                 if(testTable.getValueAt(row, 5) != null)
                 {
-                    field6.setText(testTable.getValueAt(row, 5).toString());
+                    field6.setText(testTable.getValueAt(row, 6).toString());
                 }
                 else
                     field6.setText("");
                 if(testTable.getValueAt(row, 6) != null)
                 {
-                    field7.setSelectedItem((testTable.getValueAt(row, 6).toString()));
+                    field7.setSelectedItem((testTable.getValueAt(row, 7).toString()));
                     
                 }
                 else
@@ -716,6 +921,8 @@ public class InsertWindow {
                 deleteItemString = "delete FROM new_schema.ResortManagement WHERE `Aisle` ='" + field4.getText() + "' "
                         + " AND `Row` = '" + field5.getText() + "' " + "AND `Column` ='" + field6.getText() +"' "
                         + "AND `Depth` ='"+ field7.getSelectedItem().toString() + "'";
+                
+                
                 
                 try {
                     getPrepareValues();
@@ -728,7 +935,10 @@ public class InsertWindow {
         });
         
     }//End of setupTable
-
+    
+  
+    
+    
     private void setupFrame()
     {
         frmInsertAsset.setVisible(true);
@@ -749,7 +959,7 @@ public class InsertWindow {
         frmInsertAsset.setIconImage(icon.getImage());
     }
 
-    private void setUpFrameComponents(JScrollPane scrollPane_1, JButton btnInsert, JButton btnUpdate, JButton btnClear) {
+    private void setUpFrameComponents(JScrollPane scrollPane_1, JButton btnUpdate, JButton btnClear) {
         scrollPane_1.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS);
         springLayout.putConstraint(SpringLayout.NORTH, scrollPane_1, 24, SpringLayout.NORTH, frmInsertAsset.getContentPane());
         springLayout.putConstraint(SpringLayout.SOUTH, scrollPane_1, -37, SpringLayout.SOUTH, frmInsertAsset.getContentPane());
@@ -766,17 +976,17 @@ public class InsertWindow {
         updateBtn.setSize(180, 38);
         clearBtn.setSize(448, 38);
         //Button Insert
-        btnInsert.setLocation(15, 662);
-        btnInsert.setFont(new Font("Segoe UI Semilight", Font.PLAIN, 22));
-        frmInsertAsset.getContentPane().add(btnInsert);
+        //btnInsert.setLocation(15, 662);
+        //btnInsert.setFont(new Font("Segoe UI Semilight", Font.PLAIN, 22));
+        //frmInsertAsset.getContentPane().add(btnInsert);
         btnUpdate.setLocation(275, 662);
         btnUpdate.setFont(new Font("Segoe UI Semilight", Font.PLAIN, 22));
         frmInsertAsset.getContentPane().add(btnUpdate);
         btnClear.setLocation(913, 653);
         btnClear.setFont(new Font("Segoe UI Semilight", Font.PLAIN, 22));
         frmInsertAsset.getContentPane().add(btnClear);
-        springLayout.putConstraint(SpringLayout.WEST, updateBtn, 70, SpringLayout.EAST, insertBtn);
-        springLayout.putConstraint(SpringLayout.EAST, updateBtn, 218, SpringLayout.EAST, insertBtn);
+        springLayout.putConstraint(SpringLayout.WEST, updateBtn, 30, SpringLayout.WEST, frmInsertAsset.getContentPane());
+        springLayout.putConstraint(SpringLayout.EAST, updateBtn, 268, SpringLayout.WEST, frmInsertAsset.getContentPane());
         
         excelBtn.setFont(new Font("Segoe UI Semilight", Font.PLAIN, 22));
         //frmInsertAsset.getContentPane().add(excelBtn);
@@ -790,8 +1000,6 @@ public class InsertWindow {
         springLayout.putConstraint(SpringLayout.WEST, excelBtn, 76, SpringLayout.EAST, clearBtn);
         springLayout.putConstraint(SpringLayout.EAST, excelBtn, -175, SpringLayout.WEST, scrollPane_1);
         springLayout.putConstraint(SpringLayout.NORTH, deleteBtn, 0, SpringLayout.NORTH, insertBtn);
-        springLayout.putConstraint(SpringLayout.WEST, deleteBtn, 70, SpringLayout.EAST, updateBtn);
-        springLayout.putConstraint(SpringLayout.EAST, deleteBtn, -78, SpringLayout.WEST, scrollPane_1);
         deleteBtn.setFont(new Font("Segoe UI Semilight", Font.PLAIN, 22));
         frmInsertAsset.getContentPane().add(deleteBtn);
         
@@ -821,8 +1029,6 @@ public class InsertWindow {
         scrollPane.setLocation(15, 80);
         //scrollPane.setSize(561, 610);
         scrollPane.getVerticalScrollBar().setUnitIncrement(16);
-    
-    
         scrollPane.setViewportView(g1_Jpanel);
         frmInsertAsset.getContentPane().add(scrollPane);    
     }
@@ -836,7 +1042,6 @@ public class InsertWindow {
         //remove items in combobox
         field3.removeAllItems();
 
-        
         stmt = conn.createStatement(); // \"group\",price //\"group\",price
         ResultSet rs = stmt.executeQuery("SELECT Distinct Type From ResortManagement");
         String group = "";
@@ -868,27 +1073,31 @@ public class InsertWindow {
     private void setTextFieldName()
     {
         field1.setName("1");
-        field2.setName("2");
-        field3.setName("3");
-        field4.setName("4");
-        field5.setName("5");
-        field6.setName("6");
-        field7.setName("7");
+        field2a.setName("2");
+        field2b.setName("3");
+        field3.setName("4");
+        field4.setName("5");
+        field5.setName("6");
+        field6.setName("7");
+        field7.setName("8");
         
     }
     private void setFont(){
         Font font = new Font("Segoe UI Semilight", Font.PLAIN, 20);
         field1.setFont(font);
-        field2.setFont(font);
+        field2a.setFont(font);
+        field2b.setFont(font);
         field3.setFont(font);
         field4.setFont(font);
         field5.setFont(font);
         field6.setFont(font);
-        field7.setFont(font);    
+        field7.setFont(font); 
+        
     }
     private boolean isFieldsEmpty()
     {
-        if((field1.getText().equals("") || field2.getText().equals("") || field4.getText().equals("")
+        if((field1.getText().equals("") || field2a.getText().equals("") 
+        		|| field2b.getText().equals("") || field4.getText().equals("")
             ||field5.getText().equals("") || field6.getText().equals("")) 
                 || isField3Empty() )
         {
@@ -908,7 +1117,8 @@ public class InsertWindow {
     private void clearFields()
     {
         field1.setText("");
-        field2.setText("");
+        field2a.setText("");
+        field2b.setText("");
         field3.setSelectedIndex(0);
         field4.setText("");
         field5.setText("");
@@ -917,7 +1127,7 @@ public class InsertWindow {
     }
     private boolean validateFields()
     {
-        if(field2.getText().length() !=4)
+        if(field2a.getText().length() !=4 || field2b.getText().length() !=4)
         {
             JOptionPane.showMessageDialog(null, "Year must be ented in this format: YYYY "  , "Error", JOptionPane.ERROR_MESSAGE);
             return false;
@@ -946,15 +1156,42 @@ public class InsertWindow {
     private void getPrepareValues() throws SQLException
     {
         prepare.setString(1, field1.getText());
-        prepare.setInt(2, Integer.parseInt(field2.getText()));
+        prepare.setInt(2, Integer.parseInt(field2a.getText()));
         prepare.setString(3, field3.getSelectedItem().toString());
         prepare.setInt(4, Integer.parseInt(field4.getText()));
         prepare.setInt(5, Integer.parseInt(field5.getText()));
         prepare.setInt(6, Integer.parseInt(field6.getText()));
         prepare.setString(7, field7.getSelectedItem().toString());
     }
+   
     public void setPrepareField7() throws NumberFormatException, SQLException
     {
         prepare.setString(Integer.parseInt(field7.getName()), field7.getSelectedItem().toString());
     }
+    
+    private void insertMethodCalls() throws SQLException
+    {
+    	  prepare.executeUpdate();
+          prepare.getConnection().commit();
+          prepare.close();
+          initPrepareStatment();
+          clearFields();
+          UpDateTable();
+          addTypes();
+          setPrepareField7();
+          autoComplete();
+    }
+    
+    private void autoComplete() throws SQLException
+    {
+    	Statement stmt = conn.createStatement();
+		ResultSet rs = stmt.executeQuery("SELECT Distinct AssociationName From ResortManagement");
+		complete.removeAllItems();
+		while (rs.next()) {			
+	        complete.addItem(rs.getString("AssociationName"));
+		}
+		rs.close();
+		stmt.close();
+    }
+
 }

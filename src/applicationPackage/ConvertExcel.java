@@ -1,4 +1,5 @@
 package applicationPackage;
+
 //comment comment
 import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.util.SystemOutLogger;
@@ -21,14 +22,14 @@ import java.util.Date;
 import java.util.HashSet;
 import java.util.Iterator;
 
-
 /**
- *  Converts Data from JTable to excel
- *  boolean tempalteState, when true only writes the column header for excel
+ * Converts Data from JTable to excel boolean tempalteState, when true only
+ * writes the column header for excel
  */
 public class ConvertExcel {
 
-    public static void exportExcel(boolean templateState)throws IOException
+
+    public static void exportExcel(boolean templateState)throws IOException, SQLException
     {
         JTable table = new JTable();
         DateTime dt = new DateTime();
@@ -343,7 +344,7 @@ public class ConvertExcel {
             Connection conn = MySQLConnection.dbConnector();
             DefaultTableModel dm = new DefaultTableModel();
             //query and resultset
-            String testTable_String = "Select AssociationName, Year, Type, Aisle, `Row`, `Column`, Depth from ResortManagement";
+            String testTable_String = "Select * from ResortManagement";
             PreparedStatement showTestTable = conn.prepareStatement(testTable_String);
             ResultSet rsTest = showTestTable.executeQuery();
             addRowsAndColumns(rsTest, dm);
@@ -511,7 +512,6 @@ public class ConvertExcel {
                     if(j==size-1)//num of columns in database
                     {
                         prepare.executeUpdate();
-                        prepare.getConnection().commit();
                     }
                 }
                 else
@@ -526,6 +526,9 @@ public class ConvertExcel {
             }// end of j loop
             
         }//end of i loop
+        
+        prepare.getConnection().commit();
+        prepare.close();
         try {
             file.close();
         } catch (IOException e1) {
@@ -535,30 +538,5 @@ public class ConvertExcel {
 
 
     }
+
 }
-    //end of method
-    
-
-//    public static void main(String args[]) throws IOException
-//    {
-//        //writeExcel();
-//        long startTime = System.currentTimeMillis();
-//        //JTable table = new JTable();
-//        File  file = new File("C:\\Users\\Zelos\\Documents\\GitHub\\SpecsProject\\SpecsProject\\Excel\\ResortExcel.xlsx");
-//        
-//        try {
-//            importExcel(file);
-//        } catch (SQLException e) {
-//            // TODO Auto-generated catch block
-//            e.printStackTrace();
-//        }
-//        long endTime   = System.currentTimeMillis();
-//        long totalTime = endTime - startTime;
-//        SimpleDateFormat sdf = new SimpleDateFormat("mm:ss");
-//        Date resultdate = new Date(totalTime);
-//        //System.out.println(sdf.format(resultdate));
-//        System.out.println("SUCCESS");
-//
-//    }
-
-//}//End of ConvertExcel
