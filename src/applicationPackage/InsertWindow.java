@@ -24,7 +24,6 @@ import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Calendar;
 import java.util.Collections;
 
 import javax.swing.DefaultCellEditor;
@@ -273,27 +272,30 @@ public class InsertWindow {
     
     private void updateItems(String key) throws SQLException {
 
-       	Calendar calendar = Calendar.getInstance();
-    	// 2) get a java.util.Date from the calendar instance.
-//      this date will represent the current instant, or "now".
-    	java.util.Date now = calendar.getTime();
-    	// 3) a java current time (now) instance
-    	java.sql.Timestamp currentTimestamp = new java.sql.Timestamp(now.getTime());
-    	
     	String defaultField1 = null;
     	String defaultField2a = null;
     	String defaultField2b = null;
     	String defaultField3 = null;
-    	String defaultField10 = currentTimestamp.toString();
- 
-
+    	//delete
+    	int length = selection.length;
+    	int maxID;
+    	int [] aisleArray = null;
+    	int [] rowArray = null;
+    	int [] columnArray = null;
+    	String [] depthArray = null;
+    
     	if(key.equals("delete"))
     	{
     		defaultField1 = "********";
     		defaultField2a = "0000";
     		defaultField2b = "0000";
     		defaultField3 = "";
-    
+    		
+    		
+    		aisleArray = new int[length];
+        	rowArray =  new int[length];
+        	columnArray =  new int[length];
+        	depthArray =  new String[length];
     	}
     	else
     	{
@@ -314,11 +316,8 @@ public class InsertWindow {
     			IDs.add(getId);
     			//gets aisle,row, colum,depth
 
-    	
-
-
     			if(i==selection.length-1){
-    				
+    				maxID = selection[i];
     			} else{
     				IDs.add(", ");
     			}
@@ -331,12 +330,50 @@ public class InsertWindow {
     			//sb.append(", ");
     		}
 
+    		//System.out.println(sb.toString());
     		
+
+    		if(key == "delete")
+    		{
+    			updateFieldsSQL = "DELETE FROM `new_schema`.`ResortManagement` "
+        				+ " WHERE `ID` IN (" + sb.toString() + ")";
+        		//System.out.println(updateFieldsSQL);
+        		
+        		prepareUpdate = conn.prepareStatement(updateFieldsSQL);
+        		prepareUpdate.executeUpdate();
+        		prepareUpdate.getConnection().commit();
+
+        		String query = "INSERT into `new_schema`.`ResortManagement` (`AssociationName`, `StartYear`, `EndYear`, `Type`, `Aisle`, `Row`, `Column`, `Depth`) "
+        	                + "values (?,?,?,?,"
+        	                + "?,?,?,?)";
+        		prepareUpdate = conn.prepareStatement(query);
+
+        		for(int i=0;i<length;i++)
+        		{
+        			
+        			prepareUpdate.setString(1, defaultField1);
+        			prepareUpdate.setInt(2, Integer.parseInt(defaultField2a));
+        			prepareUpdate.setInt(3, Integer.parseInt(defaultField2b));
+        			prepareUpdate.setString(4, defaultField3);
+        			
+        			prepareUpdate.setInt(5, aisleArray[i]);
+        			prepareUpdate.setInt(6, rowArray[i]);
+        			prepareUpdate.setInt(7, columnArray[i]);
+        			prepareUpdate.setString(8, depthArray[i]);
+        			prepareUpdate.addBatch();
+
+        		}
+        		prepareUpdate.executeBatch();
+        		//prepareUpdate.getConnection().commit();
+            	prepareUpdate.close();
+
+    		}
+    		else
+    		{
     			updateFieldsSQL = "UPDATE `new_schema`.`ResortManagement` SET `AssociationName`='" + defaultField1 +"', "
         				+ "`StartYear`='" + defaultField2a + "', "
         				+ "`EndYear`='" + defaultField2b + "', "
         				+ "`Type`='" + defaultField3 + "' "
-        				//+ "`LastModified`='" + defaultField10 + "' "
         				+ " WHERE `ID` IN (" + sb.toString() + ")";
         		System.out.println(updateFieldsSQL);
         		
@@ -346,7 +383,7 @@ public class InsertWindow {
             	prepareUpdate.close();
 
     			
-    		
+    		}
     		
 
 
@@ -355,6 +392,7 @@ public class InsertWindow {
     	addTypes();
     	UpDateTable();
     	autoComplete();
+    	JOptionPane.showMessageDialog(null, "Successfully deleted item: " + field1.getText());
     	//conn.close();
     }
 //    private void updateItems() throws SQLException {
@@ -642,7 +680,7 @@ public class InsertWindow {
                 @Override
                 public Class getColumnClass(int c) {
                     //System.out.println(getValueAt(0, c).getClass().toString());
-                    if(c == 1 || c==2 || c==4 || c==5 || c==6  )
+                    if(c == 1 || c==4 || c==5 || c==6  )
                     {
                         return Integer.class;
                     }
@@ -682,14 +720,10 @@ public class InsertWindow {
         int count = 0;
         while(rs.next()){
             for(int i=0;i<cols;i++){
-                if(i == 1 || i==2 || i==4 || i==5 || i==6)
+                if(i == 1 || i==4 || i==5 || i==6)
                 {
                     row[i]=Integer.parseInt(rs.getString(i+1));
                 }
-//                else if(i== 9)
-//                {
-//                	row[i] =rs.getTimestamp(i+1);
-//                }
                 else
                     row[i]=rs.getString(i+1);
             }
@@ -729,8 +763,7 @@ public class InsertWindow {
         testTable.getColumnModel().getColumn(5).setPreferredWidth(100);
         testTable.getColumnModel().getColumn(6).setPreferredWidth(100);
         testTable.getColumnModel().getColumn(7).setPreferredWidth(100);
-        testTable.getColumnModel().getColumn(8).setPreferredWidth(100);
-        testTable.getColumnModel().getColumn(9).setPreferredWidth(240);
+
     }
     
     private void addTextBoxFields()
