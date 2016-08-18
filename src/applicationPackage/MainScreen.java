@@ -24,6 +24,7 @@ import java.awt.event.WindowListener;
 import java.awt.Toolkit;
 
 import java.net.URISyntaxException;
+import java.sql.SQLException;
 
 public class MainScreen extends JApplet {
 
@@ -125,8 +126,19 @@ public class MainScreen extends JApplet {
 			public void mouseClicked(MouseEvent arg0) {
 				try {
 
-					InsertWindow insertFrame = new InsertWindow();
-					frame.setVisible(false);
+					SwingUtilities.invokeLater(new Runnable() {
+					    @Override
+					    public void run() {
+					        try {
+								new InsertWindow();
+							} catch (ClassNotFoundException | InstantiationException | IllegalAccessException
+									| SQLException | UnsupportedLookAndFeelException e) {
+								// TODO Auto-generated catch block
+								e.printStackTrace();
+							}
+					    }
+					});
+					
 				} catch (Exception e) {
 					e.printStackTrace();
 				}
