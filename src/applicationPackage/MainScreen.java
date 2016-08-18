@@ -91,7 +91,7 @@ public class MainScreen extends JApplet {
 			}
 
 			@Override
-			public void mouseClicked(MouseEvent arg0) {
+			public void mouseReleased(MouseEvent arg0) {
 				try {
 
 					new reportsFrame();
@@ -123,7 +123,7 @@ public class MainScreen extends JApplet {
 			}
 
 			@Override
-			public void mouseClicked(MouseEvent arg0) {
+			public void mouseReleased(MouseEvent arg0) {
 				try {
 
 					SwingUtilities.invokeLater(new Runnable() {
@@ -131,6 +131,7 @@ public class MainScreen extends JApplet {
 					    public void run() {
 					        try {
 								new InsertWindow();
+								frame.setVisible(false);
 							} catch (ClassNotFoundException | InstantiationException | IllegalAccessException
 									| SQLException | UnsupportedLookAndFeelException e) {
 								// TODO Auto-generated catch block
@@ -166,7 +167,7 @@ public class MainScreen extends JApplet {
 			}
 
 			@Override
-			public void mouseClicked(MouseEvent arg0) {
+			public void mouseReleased(MouseEvent arg0) {
 				try {
 					ExcelFrame excelFrame = new ExcelFrame();
 					frame.setVisible(false);

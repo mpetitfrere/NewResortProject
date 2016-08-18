@@ -850,6 +850,8 @@ public class InsertWindow {
     private void setupFrame()
     {
         frmInsertAsset.setVisible(true);
+    	//frmInsertAsset.pack();
+
         Dimension DimMax = Toolkit.getDefaultToolkit().getScreenSize();
         frmInsertAsset.setMaximumSize(DimMax);
     
