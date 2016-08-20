@@ -341,52 +341,52 @@ public class ConvertExcel {
 
     }
 
-    //checks dir if fielname already, if it does output new filename
     public static String excelName()
-    {
-        String fileLocation  = System.getProperty("user.dir");
+	{
+		String fileLocation  = System.getProperty("user.dir");
 
-        File theDir = new File("Excel");
+		File theDir = new File("Excel");
 
-        // if the directory does not exist, create it
-        if (!theDir.exists()) {
-            //System.out.println("creating directory: " + System.getProperty("user.dir") + "/Excel");
-            boolean result = false;
+		// if the directory does not exist, create it
+		if (!theDir.exists()) {
+			//System.out.println("creating directory: " + System.getProperty("user.dir") + "/Excel");
+			boolean result = false;
 
-            try{
-                theDir.mkdir();
-                result = true;
-            }
-            catch(SecurityException se){
-                //handle it
-            }
-            if(result) {
-                System.out.println("DIR created");
-            }
-        }
-        File folder = new File(fileLocation + "/Excel/");
-        File[] listOfFiles = folder.listFiles();
+			try{
+				theDir.mkdir();
+				result = true;
+			}
+			catch(SecurityException se){
+				//handle it
+			}
+			if(result) {
+				System.out.println("DIR created");
+			}
+		}
+		File folder = new File(fileLocation + "/Excel/");
+		File[] listOfFiles = folder.listFiles();
 
-        File file = new File("Excel\\\\Form(1).xlsx");
-        //File file2 = new File("Excel\\\\Apachi " + date + ".xlsx");
+		File file = new File("Excel\\Form.xlsx");
+		//File file2 = new File("Excel\\Apachi " + date + ".xlsx");
 
-        String fileName = fileLocation + "\\\\" + file.toString();
+		String fileName = fileLocation + "\\" + file.toString();
 
-        //loop will rename file if the filename exist already at the directory
-        for(int i =0; i < listOfFiles.length;i++)
-        {
-            //System.out.println(listOfFiles[i]);
+		//loop will rename file if the filename exist already at the directory
+		for(int i =0; i < listOfFiles.length;i++)
+		{
+			//System.out.println(listOfFiles[i]);
 
-            if(fileName.equals(listOfFiles[i].toString()))
-            {
-                file = new File("Excel\\\\Form" + "(" + (i) +")" + ".xlsx");//need to change i to i plus 1
-                fileName = (file.toString());
-                break;
-            }
-        }
+			if(fileName.equals(listOfFiles[i].toString()))
+			{
+				file = new File("Excel\\Form" + "(" + (i+1) +")" + ".xlsx");//need to change i to i plus 1
+				fileName = (file.toString());
+				break;
+			}
+		}
 
-        return fileName;
-    }//end of method
+		return fileName;
+	}//end of method
+
 
     public static String getDate()
     {
