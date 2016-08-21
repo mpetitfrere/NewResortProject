@@ -59,6 +59,7 @@ import org.apache.poi.util.SystemOutLogger;
 import com.mxrck.autocompleter.TextAutoCompleter;
 
 import applicationPackage.ExcelFrame;
+import ca.odell.glazedlists.EventList;
 import ca.odell.glazedlists.GlazedLists;
 import ca.odell.glazedlists.swing.AutoCompleteSupport;
 
@@ -108,6 +109,9 @@ public class InsertWindow {
     private JButton insertBtn;
     private JButton deleteBtn;
     private static JLabel totalLabel;
+    private  String[] associationNameArray;
+    private  EventList<String> associationNameEventList;
+    
     
     /**
      * Launch the application.
@@ -150,6 +154,8 @@ public class InsertWindow {
     	field1.setFont(new Font("Arial", Font.BOLD, 14));
     	//init objects
     	conn= MySQLConnection.dbConnector();
+        associationNameEventList = GlazedLists.eventListOf();
+
 
         //Components
         JScrollPane scrollPane_1 = new JScrollPane();
@@ -169,10 +175,11 @@ public class InsertWindow {
         addTextBoxFields();
         addTypes();
         getAssociationNames();
-
         getTypes();
         getInputFromFields();
         actionPerformedBtn();
+		AutoCompleteSupport.install(field1, associationNameEventList);
+
         
 
         frmInsertAsset.addWindowListener(new WindowAdapter()
@@ -350,6 +357,7 @@ public class InsertWindow {
     	}
     	//UpDateTable();
     	addTypes();
+    	getAssociationNames();
     	UpDateTable();
 
     	//JOptionPane.showMessageDialog(null, "Successfully deleted item: " + field1.getText());
@@ -919,6 +927,7 @@ public class InsertWindow {
         
         //sort the types add the editable field first then add the sorted types to combobox
         Collections.sort(typeList);
+        
         field3.addItem("<New Type>");
         for(String str: typeList){
             field3.addItem(str);
@@ -1011,46 +1020,24 @@ public class InsertWindow {
         ArrayList<String> typeList = new ArrayList<String>();
         int count = 0;
         //remove items in combobox
-        field1.removeAllItems();
 
         stmt = conn.createStatement(); // \"group\",price //\"group\",price
         ResultSet rs = stmt.executeQuery("SELECT Distinct AssociationName FROM ResortManagement");
         String association = "";
         
+        associationNameEventList.clear();
         while (rs.next()) 
         {
             //get types from database
         	association = rs.getString("AssociationName");
-            typeList.add(association);
-            count++;
+        	 associationNameEventList.add(association);
         }
-        
-        String[] associationNameArray = new String[count];
-        count =0;
         
         //close connections
         rs.close();
         stmt.close();
-        
-        for(String str: typeList){
-            field1.addItem(str);
-            associationNameArray[count] = str;
-            count++;
-        }
-		AutoCompleteSupport.install(field1, GlazedLists.eventListOf(associationNameArray));
 
-    }
-    
-    private void autoComplete() throws SQLException
-    {
-    	Statement stmt = conn.createStatement();
-		ResultSet rs = stmt.executeQuery("SELECT Distinct AssociationName From ResortManagement");
-		complete.removeAllItems();
-		while (rs.next()) {			
-	        complete.addItem(rs.getString("AssociationName"));
-		}
-		rs.close();
-		stmt.close();
+
     }
 
 }
