@@ -558,19 +558,7 @@ public class reportsFrame {
 					ConvertExcel.exportExcel(reportsTable);
 				} catch (IOException e) {
 					e.printStackTrace();
-				} catch (NullPointerException e1) {
-					if (e1.toString().contains("java.lang.NullPointerException")) {
-						Scanner input = null;
-						String line;
-						try {
-							input = new Scanner(new File("LogReportFrameNullPointer.txt"));
-						} catch (FileNotFoundException e2) {
-							e2.printStackTrace();
-						}
-						line = input.nextLine();
-						JOptionPane.showMessageDialog(null, "Check ID_Tag: " + line + "'s rows for errors");
-					}
-				}
+				} 
 
 			}
 		});

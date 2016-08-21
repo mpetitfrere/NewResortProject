@@ -14,6 +14,7 @@ import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
+import java.io.IOException;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -53,6 +54,8 @@ import javax.swing.table.TableModel;
 import javax.swing.text.DefaultFormatterFactory;
 import javax.swing.text.MaskFormatter;
 
+import org.apache.poi.util.SystemOutLogger;
+
 import com.mxrck.autocompleter.TextAutoCompleter;
 
 import applicationPackage.ExcelFrame;
@@ -80,13 +83,13 @@ public class InsertWindow {
     private JPanel g1_Jpanel;
     private static Connection conn;
     //Global Variables
-    private PreparedStatement prepare;
     private String     field3InputString;
     private String numSwap;
     private String autoIDString;
     private String deleteItemString;
     private TextAutoCompleter complete;
     int[] selection;
+    String excelString;
 
     // instantiating textfields for each jlabel
     private JTextField field1 = new JTextField();
@@ -165,7 +168,6 @@ public class InsertWindow {
         setUpFrameComponents(scrollPane_1,  updateBtn, clearBtn);
         gridLayoutSetup();
         setupTable(scrollPane_1);
-        initPrepareStatment();
         addTextBoxFields();
         addTypes();
         getTypes();
@@ -204,59 +206,70 @@ public class InsertWindow {
                 clearFields();
             }
         });
-        /*excelBtn.addActionListener(new ActionListener() {
+        excelBtn.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                ExcelFrame frame = new ExcelFrame();
-                frmInsertAsset.setVisible(false);
-                frame.setVisible(true);
-            }
-        });*/
-        insertBtn.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                insertToDB();
-                
-            }
-            private void insertToDB() {
-            	if(!isFieldsEmpty() && validateFields())
+            	if(selection != null)
             	{
-            		try {
-            			insertMethodCalls();
-            			JOptionPane.showMessageDialog(null, "Successfully inserted into database.", "Success" , JOptionPane.INFORMATION_MESSAGE);
-
-            		} catch (SQLException e) {
-            			// Check Duplicate Entry on index LOCATION
-            			if(e.getMessage().contains("key 'LOCATION'"))
-            			{
-            				JOptionPane.showMessageDialog(null, "There is already an item  at \nAisle :" + field4.getText() + "\nRow: " + field5.getText()
-            				+ "\nColumn: " + field6.getText() + "\nDepth: " + field7.getSelectedItem().toString() 
-            				+ "\nPlease change the location and insert again or if you wish to use this location \nplease delete or change the location of existing item \nin this location first, then try again."
-            				, "Error", JOptionPane.ERROR_MESSAGE);
-            				try {
-            					prepare.close();
-            					initPrepareStatment();
-            					getPrepareValues();
-            				} catch (SQLException e1) {
-            					// TODO Auto-generated catch block
-            					//e1.printStackTrace();
-            				}    
-            			}
-            			else if(e.getMessage().contains("Communications link failure"))
-            			{
-            				JOptionPane.showMessageDialog(null, "Internet connection was lost. Please try again.");
-            				try {
-            					prepare.close();
-            					initPrepareStatment();
-            					getPrepareValues();
-            				} catch (SQLException e1) {
-            					// TODO Auto-generated catch block
-            					e1.printStackTrace();
-            				}
-
-            			}
-            		}    
+	            	buildExcelString();
+	            	ConvertExcel ec = new ConvertExcel();
+	            	try {
+						ec.exportExcel(excelString);
+					} catch (IOException e1) {
+						// TODO Auto-generated catch block
+						e1.printStackTrace();
+					}
             	}
+            	else
+            	{
+                    JOptionPane.showMessageDialog(null, "You need to highlight the rows on the table, in order to export."  , "Error", JOptionPane.ERROR_MESSAGE);
+            	}
+            		
+            	
+
             }
+
+			private void buildExcelString() {
+			    String getId = "";
+            	ArrayList<String> IDs = new ArrayList<String>();
+
+                if(selection != null)
+            	{
+            		for(int i=0; i<selection.length; i++){
+            			getId = "'" + String.valueOf(testTable.getModel().getValueAt(selection[i], 8)) + "'";
+            			IDs.add(getId);
+            			//gets aisle,row, colum,depth
+
+            			if(i==selection.length-1){
+            			} else{
+            				IDs.add(", ");
+            			}
+
+            		}
+            		StringBuilder sb = new StringBuilder();
+            		for (String s : IDs)
+            		{
+            			sb.append(s);
+            			//sb.append(", ");
+            		}
+
+            		//System.out.println(sb.toString());
+            		excelString = "SELECT `AssociationName`, `StartYear`, `EndYear`, `Type`, `Aisle`,`Column`, "
+            				+ "`Row`, `Depth`, `ID`,`LastModified`"
+            				+ " FROM new_schema.ResortManagement"
+            				+ " WHERE `ID` IN (" + sb.toString() + ")";
+            	 System.out.println(excelString);
+
+
+            	}    
+				
+			}
         });
+//        insertBtn.addActionListener(new ActionListener() {
+//            public void actionPerformed(ActionEvent e) {
+//                
+//            }
+//         
+//        });
         deleteBtn.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 try {
@@ -280,12 +293,7 @@ public class InsertWindow {
     	String defaultField2b = null;
     	String defaultField3 = null;
     	//delete
-    	int length = selection.length;
-    	int maxID;
-    	int [] aisleArray = null;
-    	int [] rowArray = null;
-    	int [] columnArray = null;
-    	String [] depthArray = null;
+
     
     	if(key.equals("delete"))
     	{
@@ -293,12 +301,7 @@ public class InsertWindow {
     		defaultField2a = "0000";
     		defaultField2b = "0000";
     		defaultField3 = "";
-    		
-    		
-    		aisleArray = new int[length];
-        	rowArray =  new int[length];
-        	columnArray =  new int[length];
-        	depthArray =  new String[length];
+    				
     	}
     	else
     	{
@@ -320,7 +323,6 @@ public class InsertWindow {
     			//gets aisle,row, colum,depth
 
     			if(i==selection.length-1){
-    				maxID = selection[i];
     			} else{
     				IDs.add(", ");
     			}
@@ -334,45 +336,6 @@ public class InsertWindow {
     		}
 
     		//System.out.println(sb.toString());
-    		
-
-    		if(key == "delete")
-    		{
-    			updateFieldsSQL = "DELETE FROM `new_schema`.`ResortManagement` "
-        				+ " WHERE `ID` IN (" + sb.toString() + ")";
-        		//System.out.println(updateFieldsSQL);
-        		
-        		prepareUpdate = conn.prepareStatement(updateFieldsSQL);
-        		prepareUpdate.executeUpdate();
-        		prepareUpdate.getConnection().commit();
-
-        		String query = "INSERT into `new_schema`.`ResortManagement` (`AssociationName`, `StartYear`, `EndYear`, `Type`, `Aisle`, `Row`, `Column`, `Depth`) "
-        	                + "values (?,?,?,?,"
-        	                + "?,?,?,?)";
-        		prepareUpdate = conn.prepareStatement(query);
-
-        		for(int i=0;i<length;i++)
-        		{
-        			
-        			prepareUpdate.setString(1, defaultField1);
-        			prepareUpdate.setInt(2, Integer.parseInt(defaultField2a));
-        			prepareUpdate.setInt(3, Integer.parseInt(defaultField2b));
-        			prepareUpdate.setString(4, defaultField3);
-        			
-        			prepareUpdate.setInt(5, aisleArray[i]);
-        			prepareUpdate.setInt(6, rowArray[i]);
-        			prepareUpdate.setInt(7, columnArray[i]);
-        			prepareUpdate.setString(8, depthArray[i]);
-        			prepareUpdate.addBatch();
-
-        		}
-        		prepareUpdate.executeBatch();
-        		//prepareUpdate.getConnection().commit();
-            	prepareUpdate.close();
-
-    		}
-    		else
-    		{
     			updateFieldsSQL = "UPDATE `new_schema`.`ResortManagement` SET `AssociationName`='" + defaultField1 +"', "
         				+ "`StartYear`='" + defaultField2a + "', "
         				+ "`EndYear`='" + defaultField2b + "', "
@@ -384,11 +347,6 @@ public class InsertWindow {
         		prepareUpdate.executeUpdate();
         		prepareUpdate.getConnection().commit();
             	prepareUpdate.close();
-
-    			
-    		}
-    		
-
 
     	}
     	//UpDateTable();
@@ -446,10 +404,9 @@ public class InsertWindow {
         field1.addKeyListener(new KeyAdapter() {
             public void keyReleased(KeyEvent e) {
                 try {
-                    prepare.setString(Integer.parseInt(field1.getName()), field1.getText());
                     System.out.println("DoctorV: " + field1.getText());
 
-                } catch (NumberFormatException | SQLException e1) {
+                } catch (NumberFormatException e1) {
                     // TODO Auto-generated catch block
                     e1.printStackTrace();
                 }
@@ -466,10 +423,9 @@ public class InsertWindow {
 			@Override
 			public void insertUpdate(DocumentEvent e) {
 				 try {
-						prepare.setString(Integer.parseInt(field1.getName()), field1.getText());
 	                    System.out.println("DoctorO: " + field1.getText());
 
-					} catch (NumberFormatException | SQLException e1) {
+					} catch (NumberFormatException e1) {
 						// TODO Auto-generated catch block
 						e1.printStackTrace();
 					}}
@@ -525,57 +481,10 @@ public class InsertWindow {
             }
         });
         
-        field4.addKeyListener(new KeyAdapter() {
-            public void keyReleased(KeyEvent e) {
-                try {
-                    getIntegerInput(field4, e);
+  
+        
 
-                } catch (NumberFormatException e1) {
-                    // TODO Auto-generated catch block
-                    e1.printStackTrace();
-                }
-            }
-        });
-        
-        field5.addKeyListener(new KeyAdapter() {
-            public void keyReleased(KeyEvent e) {
-                try {
-                    getIntegerInput(field5, e);
-                } catch (NumberFormatException e1) {
-                    // TODO Auto-generated catch block
-                    e1.printStackTrace();
-                }
-            }
-        });
-        
-        field6.addKeyListener(new KeyAdapter() {
-            public void keyReleased(KeyEvent e) {
-                try {
-                    getIntegerInput(field6, e);
-                } catch (NumberFormatException e1) {
-                    // TODO Auto-generated catch block
-                    e1.printStackTrace();
-                }
-            }
-        });
-        
-        //Default
-        prepare.setString(Integer.parseInt(field7.getName()), field7.getSelectedItem().toString());
-        field7.addItemListener(new ItemListener()
-        {
-            public void itemStateChanged(ItemEvent event) {
-                try {
-                    prepare.setString(Integer.parseInt(field7.getName()), event.getItem().toString());
-                    //System.out.println(prepare);
-                } catch (NumberFormatException e) {
-                    // TODO Auto-generated catch block
-                    e.printStackTrace();
-                } catch (SQLException e) {
-                    // TODO Auto-generated catch block
-                    e.printStackTrace();
-                }
-            }}
-        );
+       
         
     }
 
@@ -600,11 +509,6 @@ public class InsertWindow {
         {
             numSwap = temp;
             int round = (Integer.parseInt(jText.getText()));
-            try {
-                prepare.setInt(Integer.parseInt(jText.getName()), round);
-            } catch (SQLException e1) {
-                e1.printStackTrace();
-            }
         }
         else if((e.getKeyCode() == KeyEvent.VK_BACK_SPACE) || (e.getKeyCode() == KeyEvent.VK_DELETE) 
                 && temp.length() == 0)
@@ -621,7 +525,6 @@ public class InsertWindow {
     private void getTypes() throws SQLException 
     {
         //field3
-        prepare.setString(3, field3.getSelectedItem().toString());
 
         field3.addItemListener(new ItemListener() {
 
@@ -699,13 +602,6 @@ public class InsertWindow {
                     if(field3.getSelectedItem() != null)
                     {
                         field3InputString = field3.getSelectedItem().toString();
-                        //System.out.println("TYPE 3 " + field3.getSelectedItem().toString() );
-                        try {
-                            prepare.setString(3, field3InputString);
-                        } catch (SQLException e2) {
-                            // TODO Auto-generated catch block
-                            e2.printStackTrace();
-                        }
 
                         //System.out.println(newTypeString);
                     }
@@ -774,20 +670,6 @@ public class InsertWindow {
         }
     }
     
-    public void initPrepareStatment() throws SQLException
-    {
-         //= MySQLConnection.dbConnector();
-        try {
-            conn.setAutoCommit(false);
-        } catch (SQLException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        }
-        String query = "INSERT into `new_schema`.`ResortManagement` (`AssociationName`, `StartYear`, `EndYear`, `Type`, `Aisle`, `Row`, `Column`, `Depth`) "
-                + "values (?,?,?,?,?,?,?,?)";
-         
-        prepare = conn.prepareStatement(query);
-    }
 
     /**
      * Refresh and resizes columns of testTable.
@@ -954,21 +836,8 @@ public class InsertWindow {
                 }
                 else
                     field7.setSelectedIndex(0);
-
-                
-                getResortID();
-                deleteItemString = "delete FROM new_schema.ResortManagement WHERE `Aisle` ='" + field4.getText() + "' "
-                        + " AND `Row` = '" + field5.getText() + "' " + "AND `Column` ='" + field6.getText() +"' "
-                        + "AND `Depth` ='"+ field7.getSelectedItem().toString() + "'";
-                
-                
-                
-                try {
-                    getPrepareValues();
-                } catch (SQLException e) {
-                    // TODO Auto-generated catch block
-                    e.printStackTrace();
-                }
+          
+            
                 //getInputFromFields();
             }
         });
@@ -981,6 +850,8 @@ public class InsertWindow {
     private void setupFrame()
     {
         frmInsertAsset.setVisible(true);
+    	//frmInsertAsset.pack();
+
         Dimension DimMax = Toolkit.getDefaultToolkit().getScreenSize();
         frmInsertAsset.setMaximumSize(DimMax);
     
@@ -1193,34 +1064,7 @@ public class InsertWindow {
             return true;    
         }
     }
-    private void getPrepareValues() throws SQLException
-    {
-        prepare.setString(1, field1.getText());
-        prepare.setInt(2, Integer.parseInt(field2a.getText()));
-        prepare.setString(3, field3.getSelectedItem().toString());
-        prepare.setInt(4, Integer.parseInt(field4.getText()));
-        prepare.setInt(5, Integer.parseInt(field5.getText()));
-        prepare.setInt(6, Integer.parseInt(field6.getText()));
-        prepare.setString(7, field7.getSelectedItem().toString());
-    }
    
-    public void setPrepareField7() throws NumberFormatException, SQLException
-    {
-        prepare.setString(Integer.parseInt(field7.getName()), field7.getSelectedItem().toString());
-    }
-    
-    private void insertMethodCalls() throws SQLException
-    {
-    	  prepare.executeUpdate();
-          prepare.getConnection().commit();
-          prepare.close();
-          initPrepareStatment();
-          clearFields();
-          UpDateTable();
-          addTypes();
-          setPrepareField7();
-          autoComplete();
-    }
     
     private void autoComplete() throws SQLException
     {

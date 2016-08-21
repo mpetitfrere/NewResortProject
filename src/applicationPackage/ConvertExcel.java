@@ -144,7 +144,65 @@ public class ConvertExcel {
         openExcel(file);
     }//end of method
 
+	/**
+     * For excel button, to export the selection fromt able
+     */
+	public void exportExcel(String query)throws IOException
+    {
 
+        String excelName = excelName();
+        File file = new File(excelName);
+        //UpDateTable(table);
+        Workbook wb = new XSSFWorkbook(); //Excel workbook
+        Sheet sheet = wb.createSheet(); //WorkSheet
+        //Row row = sheet.createRow(1); //Row created at line 3
+        
+        JTable table = new JTable();
+        DateTime dt = new DateTime();
+        UpDateTable(table,query);
+        
+
+        TableModel model = table.getModel(); //Table model
+
+        Row headerRow = sheet.createRow(0); //Create row at line 0
+        String [] colName = new String[model.getColumnCount()];
+        for(int headings = 0; headings < model.getColumnCount(); headings++){ //For each column
+            headerRow.createCell(headings).setCellValue(model.getColumnName(headings));//Write column name
+            colName[headings] = table.getColumnName(headings);
+        }
+      
+        for(int rows = 0; rows < model.getRowCount(); rows++){ //For each table row
+        	//Set the row to the next one in the sequence
+        	headerRow = sheet.createRow((rows + 1));
+            for(int cols = 0; cols < table.getColumnCount(); cols++){ //For each table column
+                if(table.getColumnName(cols).equals(colName[cols]) )
+                {
+                	 String columnString = colName[cols];
+                	 System.out.println(model.getValueAt(rows, cols).toString());
+                    if(!isColumnIntType(columnString))
+                    {//writes cell as float type to remove error checking in excel
+                        XSSFCell cell = (XSSFCell) (headerRow).createCell(cols);//create a cell at the row,col location
+                        cell.setCellValue(Float.parseFloat((String) (model.getValueAt(rows, cols))));
+
+                    }
+                    else//writes the cell as strings
+                    {
+                        XSSFCell cell = (XSSFCell) headerRow.createCell(cols);//create a cell at the row,col location
+                        String x = (String) (model.getValueAt(rows, cols));//get he  value from table
+
+                        DataFormatter dfTemp = new DataFormatter();
+                        cell.setCellValue(x);
+                        cell.setCellValue( dfTemp.formatCellValue(cell));
+                    }
+                }
+            }
+            //Set the row to the next one in the sequence          
+
+
+        }//end of row loop
+        wb.write(new FileOutputStream(file.toString()));//Save the file
+        openExcel(file);
+    }//end of method
     public static PreparedStatement initPrepare()
     {
         Connection conn = MySQLConnection.dbConnector();
@@ -168,7 +226,7 @@ public class ConvertExcel {
     public static boolean isColumnIntType(String colName)
     {
         if(colName.equals("AssociationName")||(colName.equals("Type"))
-                || (colName.equals("Depth")))
+                || (colName.equals("Depth") || colName.equals("LastModified") ))
                 {
                     return true;
                 }
@@ -283,52 +341,52 @@ public class ConvertExcel {
 
     }
 
-    //checks dir if fielname already, if it does output new filename
     public static String excelName()
-    {
-        String fileLocation  = System.getProperty("user.dir");
+	{
+		String fileLocation  = System.getProperty("user.dir");
 
-        File theDir = new File("Excel");
+		File theDir = new File("Excel");
 
-        // if the directory does not exist, create it
-        if (!theDir.exists()) {
-            //System.out.println("creating directory: " + System.getProperty("user.dir") + "/Excel");
-            boolean result = false;
+		// if the directory does not exist, create it
+		if (!theDir.exists()) {
+			//System.out.println("creating directory: " + System.getProperty("user.dir") + "/Excel");
+			boolean result = false;
 
-            try{
-                theDir.mkdir();
-                result = true;
-            }
-            catch(SecurityException se){
-                //handle it
-            }
-            if(result) {
-                System.out.println("DIR created");
-            }
-        }
-        File folder = new File(fileLocation + "/Excel/");
-        File[] listOfFiles = folder.listFiles();
+			try{
+				theDir.mkdir();
+				result = true;
+			}
+			catch(SecurityException se){
+				//handle it
+			}
+			if(result) {
+				System.out.println("DIR created");
+			}
+		}
+		File folder = new File(fileLocation + "/Excel/");
+		File[] listOfFiles = folder.listFiles();
 
-        File file = new File("Excel\\\\Form(1).xlsx");
-        //File file2 = new File("Excel\\\\Apachi " + date + ".xlsx");
+		File file = new File("Excel\\Form.xlsx");
+		//File file2 = new File("Excel\\Apachi " + date + ".xlsx");
 
-        String fileName = fileLocation + "\\\\" + file.toString();
+		String fileName = fileLocation + "\\" + file.toString();
 
-        //loop will rename file if the filename exist already at the directory
-        for(int i =0; i < listOfFiles.length;i++)
-        {
-            //System.out.println(listOfFiles[i]);
+		//loop will rename file if the filename exist already at the directory
+		for(int i =0; i < listOfFiles.length;i++)
+		{
+			//System.out.println(listOfFiles[i]);
 
-            if(fileName.equals(listOfFiles[i].toString()))
-            {
-                file = new File("Excel\\\\Form" + "(" + (i) +")" + ".xlsx");//need to change i to i plus 1
-                fileName = (file.toString());
-                break;
-            }
-        }
+			if(fileName.equals(listOfFiles[i].toString()))
+			{
+				file = new File("Excel\\Form" + "(" + (i+1) +")" + ".xlsx");//need to change i to i plus 1
+				fileName = (file.toString());
+				break;
+			}
+		}
 
-        return fileName;
-    }//end of method
+		return fileName;
+	}//end of method
+
 
     public static String getDate()
     {
@@ -337,6 +395,27 @@ public class ConvertExcel {
         return b;
     }
 
+    
+    public static void UpDateTable(JTable table, String query)
+    {//Duplicate
+        try
+        {
+            Connection conn = MySQLConnection.dbConnector();
+            DefaultTableModel dm = new DefaultTableModel();
+            //query and resultset
+            String testTable_String = query;
+            PreparedStatement showTestTable = conn.prepareStatement(testTable_String);
+            ResultSet rsTest = showTestTable.executeQuery();
+            addRowsAndColumns(rsTest, dm);
+            table.setModel(dm);
+            table.revalidate();
+            table.repaint();
+            table.validate();
+            conn.close();
+        } catch (Exception e) {
+            JOptionPane.showMessageDialog(null, e);
+        }
+    }
     public static void UpDateTable(JTable table)
     {//Duplicate
         try
@@ -357,6 +436,7 @@ public class ConvertExcel {
             JOptionPane.showMessageDialog(null, e);
         }
     }
+    
     
     public static void addRowsAndColumns(ResultSet rs, DefaultTableModel dm) throws SQLException
     {
