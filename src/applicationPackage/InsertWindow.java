@@ -157,7 +157,7 @@ public class InsertWindow {
         insertBtn = new JButton("Insert");
         clearBtn = new JButton("Clear Fields");
         excelBtn = new JButton("Export to Excel");
-        deleteBtn = new JButton("Delete");
+        deleteBtn = new JButton("Remove Item(s)");
         springLayout.putConstraint(SpringLayout.WEST, deleteBtn, 70, SpringLayout.EAST, updateBtn);
         springLayout.putConstraint(SpringLayout.EAST, deleteBtn, -78, SpringLayout.WEST, scrollPane_1);
 
@@ -598,7 +598,7 @@ public class InsertWindow {
             addRowsAndColumns(rsTest, dm);
 
             testTable.setModel(dm);
-            totalLabel.setText("Total number of items: " + testTable.getRowCount());
+            //totalLabel.setText("Total number of items: " + testTable.getRowCount());
 
             refreshScreen();
             //conn.close();
@@ -645,13 +645,13 @@ public class InsertWindow {
         testTable.repaint();
         testTable.validate();
         testTable.getColumnModel().getColumn(0).setPreferredWidth(240);
-        testTable.getColumnModel().getColumn(1).setPreferredWidth(120);
-        testTable.getColumnModel().getColumn(2).setPreferredWidth(120);
+        testTable.getColumnModel().getColumn(1).setPreferredWidth(100);
+        testTable.getColumnModel().getColumn(2).setPreferredWidth(100);
         testTable.getColumnModel().getColumn(3).setPreferredWidth(100);
-        testTable.getColumnModel().getColumn(4).setPreferredWidth(100);
-        testTable.getColumnModel().getColumn(5).setPreferredWidth(100);
-        testTable.getColumnModel().getColumn(6).setPreferredWidth(100);
-        testTable.getColumnModel().getColumn(7).setPreferredWidth(100);
+        testTable.getColumnModel().getColumn(4).setPreferredWidth(80);
+        testTable.getColumnModel().getColumn(5).setPreferredWidth(90);
+        testTable.getColumnModel().getColumn(6).setPreferredWidth(80);
+        testTable.getColumnModel().getColumn(7).setPreferredWidth(80);
         testTable.getColumnModel().getColumn(8).setPreferredWidth(100);
         testTable.getColumnModel().getColumn(9).setPreferredWidth(240);
 
@@ -807,7 +807,8 @@ public class InsertWindow {
         frmInsertAsset.getContentPane().setBackground(new Color(244, 244, 244));
         frmInsertAsset.setFont(new Font("Segoe UI Semilight", Font.PLAIN, 12));
         frmInsertAsset.setTitle("Insert Asset");
-        frmInsertAsset.setBounds(100, 100, 1504, 793);
+        frmInsertAsset.setBounds(100, 100, 1920, 900);
+        //frmInsertAsset.setBounds(100, 100, 1504, 793);
         frmInsertAsset.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
         frmInsertAsset.setLocationRelativeTo(null);
         frmInsertAsset.getContentPane().setLayout(null);
@@ -862,13 +863,13 @@ public class InsertWindow {
         deleteBtn.setFont(new Font("Segoe UI Semilight", Font.PLAIN, 22));
         frmInsertAsset.getContentPane().add(deleteBtn);
         
-        totalLabel = new JLabel("Total number  of items: ");
+        /*totalLabel = new JLabel("Total number  of items: ");
         springLayout.putConstraint(SpringLayout.NORTH, totalLabel, 6, SpringLayout.SOUTH, scrollPane_1);
         springLayout.putConstraint(SpringLayout.WEST, totalLabel, 291, SpringLayout.EAST, excelBtn);
         springLayout.putConstraint(SpringLayout.SOUTH, totalLabel, -10, SpringLayout.SOUTH, frmInsertAsset.getContentPane());
         springLayout.putConstraint(SpringLayout.EAST, totalLabel, 792, SpringLayout.EAST, clearBtn);
         totalLabel.setFont(new Font("Segoe UI Light", Font.PLAIN, 22));
-        frmInsertAsset.getContentPane().add(totalLabel);
+        frmInsertAsset.getContentPane().add(totalLabel);*/
         
     }
 
