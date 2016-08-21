@@ -59,6 +59,8 @@ import org.apache.poi.util.SystemOutLogger;
 import com.mxrck.autocompleter.TextAutoCompleter;
 
 import applicationPackage.ExcelFrame;
+import ca.odell.glazedlists.GlazedLists;
+import ca.odell.glazedlists.swing.AutoCompleteSupport;
 
 import java.awt.event.ActionListener;
 import java.awt.event.FocusAdapter;
@@ -83,16 +85,13 @@ public class InsertWindow {
     private JPanel g1_Jpanel;
     private static Connection conn;
     //Global Variables
-    private String     field3InputString;
-    private String numSwap;
-    private String autoIDString;
-    private String deleteItemString;
     private TextAutoCompleter complete;
+    private String numSwap;
     int[] selection;
     String excelString;
 
     // instantiating textfields for each jlabel
-    private JTextField field1 = new JTextField();
+    private JComboBox field1 = new JComboBox();
     private JTextField field2a = new JTextField();
     private JTextField field2b = new JTextField();
 
@@ -151,7 +150,6 @@ public class InsertWindow {
     	field1.setFont(new Font("Arial", Font.BOLD, 14));
     	//init objects
     	conn= MySQLConnection.dbConnector();
-	    complete=new TextAutoCompleter(field1);
 
         //Components
         JScrollPane scrollPane_1 = new JScrollPane();
@@ -170,10 +168,12 @@ public class InsertWindow {
         setupTable(scrollPane_1);
         addTextBoxFields();
         addTypes();
+        getAssociationNames();
+
         getTypes();
         getInputFromFields();
         actionPerformedBtn();
-        autoComplete();
+        
 
         frmInsertAsset.addWindowListener(new WindowAdapter()
             {
@@ -305,7 +305,7 @@ public class InsertWindow {
     	}
     	else
     	{
-    		defaultField1 = field1.getText();
+    		defaultField1 = field1.getSelectedItem().toString();
     		defaultField2a = field2a.getText();
     		defaultField2b = field2b.getText();
     		defaultField3 =  field3.getSelectedItem().toString();
@@ -345,14 +345,13 @@ public class InsertWindow {
         		
         		prepareUpdate = conn.prepareStatement(updateFieldsSQL);
         		prepareUpdate.executeUpdate();
-        		prepareUpdate.getConnection().commit();
             	prepareUpdate.close();
 
     	}
     	//UpDateTable();
     	addTypes();
     	UpDateTable();
-    	autoComplete();
+
     	//JOptionPane.showMessageDialog(null, "Successfully deleted item: " + field1.getText());
     	//conn.close();
     }
@@ -396,7 +395,6 @@ public class InsertWindow {
         		SwingUtilities.invokeLater(new Runnable(){
         			@Override
         			public void run() {
-        				field1.selectAll();
         			}
         		});
         	}
@@ -404,7 +402,6 @@ public class InsertWindow {
         field1.addKeyListener(new KeyAdapter() {
             public void keyReleased(KeyEvent e) {
                 try {
-                    System.out.println("DoctorV: " + field1.getText());
 
                 } catch (NumberFormatException e1) {
                     // TODO Auto-generated catch block
@@ -413,28 +410,7 @@ public class InsertWindow {
             }
         });
         
-        //gets value from autocomplete selection
-        field1.getDocument().addDocumentListener(new DocumentListener(){
-        	@Override
-        	public void changedUpdate(DocumentEvent e) {
-               
-        	}
-
-			@Override
-			public void insertUpdate(DocumentEvent e) {
-				 try {
-	                    System.out.println("DoctorO: " + field1.getText());
-
-					} catch (NumberFormatException e1) {
-						// TODO Auto-generated catch block
-						e1.printStackTrace();
-					}}
-
-			@Override
-			public void removeUpdate(DocumentEvent e) {
-				// TODO Auto-generated method stub
-				
-			}});
+       
         
         field2a.addFocusListener(new FocusAdapter(){
         	public void focusGained(FocusEvent e) {
@@ -596,17 +572,6 @@ public class InsertWindow {
                         field3.setSelectedItem("");
                     }
                 }
-                
-                else{
-                    //Gets Type from JComboBox Field3
-                    if(field3.getSelectedItem() != null)
-                    {
-                        field3InputString = field3.getSelectedItem().toString();
-
-                        //System.out.println(newTypeString);
-                    }
-                }
-
             }
         });
     }
@@ -722,29 +687,12 @@ public class InsertWindow {
         field5.setDisabledTextColor(Color.BLACK);
         field6.setDisabledTextColor(Color.BLACK);
        
-
-
-
         field7.addItem("B");
         field7.addItem("F");
         setTextFieldName();
         setFont();
     }//End of Method
-    
-    private void getResortID()
-    {
-        //Global Variables
-        autoIDString = "SELECT  ID FROM new_schema.ResortManagement "
-                + "WHERE `AssociationName` LIKE '" + field1.getText() +"%' "
-                + "AND `StartYear` LIKE '" + field2a.getText() +"%' "
-                + "AND `EndYear` LIKE '" + field2b.getText() +"%' "
-                + "AND `Type` LIKE '" + field3.getSelectedItem().toString() +"%'"
-                + "AND `Aisle` LIKE '" + field4.getText() +"%' "
-                + "AND `Row`   LIKE '" + field5.getText() +"%' "
-                + "AND `Column` LIKE '" + field6.getText() +"%' "
-                + "AND `Depth` LIKE  '" + field7.getSelectedItem().toString() +"%'; ";
-    }
-    
+     
     
     private void setupTable(JScrollPane scrollPane_1) {
         
@@ -788,10 +736,10 @@ public class InsertWindow {
 
                 if(testTable.getValueAt(row, 0) != null)
                 {
-                    field1.setText(testTable.getValueAt(row, 0).toString());
+                    field1.setSelectedItem(testTable.getValueAt(row, 0).toString());
                 }
                 else
-                    field1.setText("");
+                    field1.setSelectedIndex(0);
                 if(testTable.getValueAt(row, 1) != null)
                 {
                     field2a.setText(testTable.getValueAt(row, 1).toString());
@@ -1005,18 +953,7 @@ public class InsertWindow {
         field7.setFont(font); 
         
     }
-    private boolean isFieldsEmpty()
-    {
-        if((field1.getText().equals("") || field2a.getText().equals("") 
-        		|| field2b.getText().equals("") || field4.getText().equals("")
-            ||field5.getText().equals("") || field6.getText().equals("")) 
-                || isField3Empty() )
-        {
-            JOptionPane.showMessageDialog(null, "Please make sure there are no empty fields"  , "Error", JOptionPane.ERROR_MESSAGE);
-            return true;
-        }
-        return false;    
-    }
+  
     private boolean isField3Empty()
     {
         if(field3.getSelectedItem().toString().length() <= 0)
@@ -1027,7 +964,7 @@ public class InsertWindow {
     }
     private void clearFields()
     {
-        field1.setText("");
+        field1.setSelectedItem(0);
         field2a.setText("");
         field2b.setText("");
         field3.setSelectedIndex(0);
@@ -1036,6 +973,7 @@ public class InsertWindow {
         field6.setText("");
         field7.setSelectedIndex(0);*/
     }
+    
     private boolean validateFields()
     {
         if(field2a.getText().length() !=4 || field2b.getText().length() !=4)
@@ -1065,6 +1003,42 @@ public class InsertWindow {
         }
     }
    
+    private void getAssociationNames() throws SQLException
+    {
+    	 //Declare local variables
+        java.sql.Statement stmt;
+        ArrayList<String> typeList = new ArrayList<String>();
+        int count = 0;
+        //remove items in combobox
+        field1.removeAllItems();
+
+        stmt = conn.createStatement(); // \"group\",price //\"group\",price
+        ResultSet rs = stmt.executeQuery("SELECT Distinct AssociationName FROM ResortManagement");
+        String association = "";
+        
+        while (rs.next()) 
+        {
+            //get types from database
+        	association = rs.getString("AssociationName");
+            typeList.add(association);
+            count++;
+        }
+        
+        String[] associationNameArray = new String[count];
+        count =0;
+        
+        //close connections
+        rs.close();
+        stmt.close();
+        
+        for(String str: typeList){
+            field1.addItem(str);
+            associationNameArray[count] = str;
+            count++;
+        }
+		AutoCompleteSupport.install(field1, GlazedLists.eventListOf(associationNameArray));
+
+    }
     
     private void autoComplete() throws SQLException
     {
