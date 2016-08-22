@@ -167,14 +167,12 @@ public class MainScreen extends JApplet {
 			}
 
 			@Override
-			public void mouseReleased(MouseEvent arg0) {
-				try {
-					ExcelFrame excelFrame = new ExcelFrame();
-					frame.setVisible(false);
-				} catch (Exception e) {
-					e.printStackTrace();
-				}
-			}
+            public void mouseClicked(MouseEvent arg0) {
+                try {
+                    String command1 = "C:\\Program Files (x86)\\Google\\Chrome\\Application\\chrome.exe https://drive.google.com/open?id=0BwHqbrMGfGzTcl9yUjZKb3FIdjQ";
+                    Process link1 = Runtime.getRuntime().exec(command1);
+                } catch (Exception ex) {System.out.println("cannot execute command. " + ex);}
+            }
 		});
 
 		JLabel lblNewLabel = new JLabel("New label");

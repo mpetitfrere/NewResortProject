@@ -289,6 +289,16 @@ public class InsertWindow {
     }
     
     private void updateItems(String key) throws SQLException {
+    	
+    	int row = testTable.getSelectedRow();
+    	
+    	if(row == -1)
+    	{
+            JOptionPane.showMessageDialog(null, "Please select a row. "  , "Error", JOptionPane.ERROR_MESSAGE);
+            return;
+    	}
+
+    		
 
     	String defaultField1 = null;
     	String defaultField2a = null;
@@ -311,7 +321,15 @@ public class InsertWindow {
     		defaultField2a = field2a.getText();
     		defaultField2b = field2b.getText();
     		defaultField3 =  field3.getSelectedItem().toString();
+    		
+    		if(!validateFields())
+    		{
+    			return;
+    		}
+    		
     	}
+    	
+    	
     	String updateFieldsSQL;
     	String getId = "";
     	PreparedStatement prepareUpdate = null;
@@ -986,25 +1004,15 @@ public class InsertWindow {
     {
         if(field2a.getText().length() !=4 || field2b.getText().length() !=4)
         {
-            JOptionPane.showMessageDialog(null, "Year must be ented in this format: YYYY "  , "Error", JOptionPane.ERROR_MESSAGE);
+            JOptionPane.showMessageDialog(null, "Year must be entered in this format: YYYY "  , "Error", JOptionPane.ERROR_MESSAGE);
             return false;
         }
-        else if(Integer.parseInt(field4.getText()) <=0 || Integer.parseInt(field4.getText()) >6)
+        else if(field3.getSelectedItem().toString().length() <= 0)        
         {
-            JOptionPane.showMessageDialog(null, "Aisle must be between 1 and 6"  , "Error", JOptionPane.ERROR_MESSAGE);
+            JOptionPane.showMessageDialog(null, "Please enter a type"  , "Error", JOptionPane.ERROR_MESSAGE);
             return false;
         }
-        else if(Integer.parseInt(field5.getText()) <=0 || Integer.parseInt(field5.getText()) >10)
-        {
-            JOptionPane.showMessageDialog(null, "Row must be between 1 and 10"  , "Error", JOptionPane.ERROR_MESSAGE);
-            return false;
-        }
-        else if(Integer.parseInt(field6.getText()) <=0 || Integer.parseInt(field6.getText()) >30)
-        {
-            JOptionPane.showMessageDialog(null, "Column must be between 1 and 30"  , "Error", JOptionPane.ERROR_MESSAGE);
-            return false;
-        }
-        
+      
         else
         {
             return true;    
@@ -1035,7 +1043,8 @@ public class InsertWindow {
         rs.close();
         stmt.close();
 
-
     }
+    
+    
 
 }
