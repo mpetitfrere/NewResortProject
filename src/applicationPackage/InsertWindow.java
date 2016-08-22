@@ -180,8 +180,6 @@ public class InsertWindow {
         actionPerformedBtn();
 		AutoCompleteSupport.install(field1, associationNameEventList);
 
-        
-
         frmInsertAsset.addWindowListener(new WindowAdapter()
             {
                 @Override
@@ -264,9 +262,6 @@ public class InsertWindow {
             				+ "`Row`, `Depth`, `ID`,`LastModified`"
             				+ " FROM new_schema.ResortManagement"
             				+ " WHERE `ID` IN (" + sb.toString() + ")";
-            	 System.out.println(excelString);
-
-
             	}    
 				
 			}
@@ -348,7 +343,6 @@ public class InsertWindow {
         				+ "`EndYear`='" + defaultField2b + "', "
         				+ "`Type`='" + defaultField3 + "' "
         				+ " WHERE `ID` IN (" + sb.toString() + ")";
-        		System.out.println(updateFieldsSQL);
         		
         		prepareUpdate = conn.prepareStatement(updateFieldsSQL);
         		prepareUpdate.executeUpdate();
@@ -738,6 +732,7 @@ public class InsertWindow {
             public void mouseReleased(java.awt.event.MouseEvent evt) {
             	//Grabs the indices form table
                 selection = testTable.getSelectedRows();
+                
                              
                 int row = testTable.getSelectedRow();    
                 //Gets text from row and fills jtext if cell is not empty
@@ -917,7 +912,10 @@ public class InsertWindow {
         {
             //get types from database
             group = rs.getString("Type");
-            typeList.add(group);
+            if(!group.equals(""))
+            {
+                typeList.add(group);
+            }
         }
         
         //close connections
